@@ -7,6 +7,7 @@ type Camera struct {
 	x, y, rotation, Width, Height, Zoom, ScreenWidth, ScreenHeight float64
 	zoomCount, zoomCountMax                                        int
 	FreeFloating                                                   bool
+	MaxZoomOut, MaxZoomIn                                          float64
 }
 
 //CreateCamera intializes a camera struct
@@ -19,6 +20,8 @@ func CreateCamera(width, height float64) *Camera {
 		ScreenHeight: height,
 		ScreenWidth:  width,
 		FreeFloating: false,
+		MaxZoomOut:   0.1,
+		MaxZoomIn:    2.0,
 	}
 	return c
 }
@@ -73,6 +76,38 @@ func (c *Camera) ChangeZoom() {
 			c.zoomCount++
 		}
 		if ebiten.IsKeyPressed(ebiten.KeyE) && c.Zoom > 0.1 {
+			c.Zoom -= increment
+			c.zoomCount++
+		}
+
+	}
+}
+
+func (c *Camera) ZoomIn() {
+	if c.zoomCount > 0 {
+		c.zoomCount++
+		if c.zoomCount > c.zoomCountMax {
+			c.zoomCount = 0
+		}
+	} else {
+		increment := 0.01
+		if c.Zoom < c.MaxZoomIn {
+			c.Zoom += increment
+			c.zoomCount++
+		}
+
+	}
+}
+
+func (c *Camera) ZoomOut() {
+	if c.zoomCount > 0 {
+		c.zoomCount++
+		if c.zoomCount > c.zoomCountMax {
+			c.zoomCount = 0
+		}
+	} else {
+		increment := 0.01
+		if ebiten.IsKeyPressed(ebiten.KeyE) && c.Zoom > c.MaxZoomOut {
 			c.Zoom -= increment
 			c.zoomCount++
 		}
@@ -139,7 +174,7 @@ func (c *Camera) DrawCameraTransformIgnoreZoom(op *ebiten.DrawImageOptions) {
 //FollowPlayer follows the specified character (in this case the player)
 func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64) {
 
-	c.ChangeZoom()
+	//c.ChangeZoom()
 
 	worldHeight *= c.Zoom
 	worldWidth *= c.Zoom
