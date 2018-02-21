@@ -12,15 +12,18 @@ type Menu struct {
 	maxWidth, maxHeight                    int
 	backgroundImage                        *ebiten.Image
 	backgroundImgParts                     *BasicImageParts
+	selectedRow, selectedCol               int
 }
 
 //NewMenu creates a new menu
 func NewMenu() *Menu {
 	m := &Menu{
-		midStartX: Components.ScreenWidth / 2,
-		midStartY: Components.ScreenHeight / 4,
-		paddingX:  10,
-		paddingY:  20,
+		midStartX:   Components.ScreenWidth / 2,
+		midStartY:   Components.ScreenHeight / 4,
+		paddingX:    10,
+		paddingY:    20,
+		selectedRow: -1,
+		selectedCol: -1,
 	}
 	return m
 }
@@ -37,6 +40,26 @@ func (m *Menu) SetBackground(src *ebiten.Image, imgParts *BasicImageParts) {
 
 	m.backgroundImage = src
 	m.backgroundImgParts = imgParts
+}
+
+func (m *Menu) SelectHorizontal(id int) {
+	m.selectedCol = 0
+	m.selectedRow = id
+}
+
+func (m *Menu) SelectVertical(id int) {
+	m.selectedCol = id
+}
+
+func (m *Menu) ReturnSelected() (int, int) {
+	return m.selectedRow, m.selectedCol
+}
+
+func (m *Menu) PressSelected() {
+	if m.selectedCol == -1 || m.selectedRow == -1 {
+		return
+	}
+	m.Elements[m.selectedRow][m.selectedCol].Action()
 }
 
 //Update the menu
@@ -62,7 +85,14 @@ func (m *Menu) Update() {
 			}
 
 			//m.elements[x][y].UIElement.SetPosition(mx, my)
-			m.Elements[x][y].Update()
+			if m.Elements[x][y].Update() {
+				m.selectedCol = -1
+				m.selectedRow = -1
+			}
+			if x == m.selectedRow && y == m.selectedCol {
+				m.Elements[x][y].highlighted = true
+				m.Elements[x][y].Highlighted()
+			}
 		}
 	}
 }
@@ -177,10 +207,11 @@ func (m *MenuElement) SetAction(function func()) {
 }
 
 //Update the MenuElement
-func (m *MenuElement) Update() {
-
+func (m *MenuElement) Update() bool {
+	mouseHighlight := false
 	if m.UIElement.Contains(Input.Mouse.X, Input.Mouse.Y) {
 		if m.Selectable {
+			mouseHighlight = true
 			m.Highlighted()
 			m.highlighted = true
 			if Input.LeftClick().JustPressed() {
@@ -198,4 +229,5 @@ func (m *MenuElement) Update() {
 	}
 
 	m.UIElement.Update()
+	return mouseHighlight
 }
