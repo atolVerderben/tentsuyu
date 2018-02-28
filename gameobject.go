@@ -27,7 +27,25 @@ type BasicObject struct {
 	VX, VY             float64
 	NotCentered        bool
 	Width, Height      int
+	IsCircle           bool
 	Box                collision2d.Box
+	Circle             collision2d.Circle
+}
+
+//SetCollision2D will allow the object to use more advanced collision functions
+func (obj *BasicObject) SetCollision2D(isCircle bool) {
+	x, y := obj.GetPosition()
+	if obj.NotCentered {
+		x += float64(obj.Width) / 2
+		y += float64(obj.Height) / 2
+	}
+
+	if isCircle {
+		obj.IsCircle = isCircle
+		obj.Circle = collision2d.NewCircle(collision2d.NewVector(x, y), float64(obj.Width))
+	} else {
+		obj.Box = collision2d.NewBox(collision2d.NewVector(x, y), float64(obj.Width), float64(obj.Height))
+	}
 }
 
 //========================================================

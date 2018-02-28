@@ -34,10 +34,14 @@ func NewInputController() *InputController {
 	ic.RegisterButton("TextBox8", ebiten.Key8)
 	ic.RegisterButton("TextBox9", ebiten.Key9)
 	ic.RegisterButton("TextBoxPeriod", ebiten.KeyPeriod)
+	ic.RegisterButton("TextBoxSpace", ebiten.KeySpace)
 	ic.RegisterButton("TextBoxBackspace", ebiten.KeyBackspace)
 	ic.RegisterButton("TextBoxEnter", ebiten.KeyEnter)
 	ic.RegisterButton("TextBoxSemiColon", ebiten.KeySemicolon)
 	ic.RegisterButton("TextBoxShift", ebiten.KeyShift)
+
+	ic.RegisterButton("TextBoxSlash", ebiten.KeySlash)
+	ic.RegisterButton("TextBoxBackSlash", ebiten.KeyBackslash)
 
 	//Letters
 	ic.RegisterButton("TextBoxA", ebiten.KeyA)
