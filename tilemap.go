@@ -115,6 +115,7 @@ func ReadMap(filename string) *Map {
 	return m
 }
 
+//ReadMapfromString reads an entire Map struct from a given string (represented by json)
 func ReadMapfromString(jString string) *Map {
 	raw := []byte(jString)
 

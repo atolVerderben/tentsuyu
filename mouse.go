@@ -14,12 +14,14 @@ const (
 	MouseStateJustUp
 )
 
+//Mouse represents the cursor
 type Mouse struct {
 	X, Y      float64
 	buttonMap map[ebiten.MouseButton]MouseState
 	mutex     sync.RWMutex
 }
 
+//Set tells the mouse to press the selected mouse button
 func (m *Mouse) Set(key ebiten.MouseButton, state bool) {
 	m.mutex.Lock()
 
@@ -59,6 +61,7 @@ func (m *Mouse) GetGameMouseCoordsNoZoom() (x, y float64) {
 	return x, y
 }
 
+//NewMouse returns a new pointer to a Mouse struct
 func NewMouse() *Mouse {
 	m := &Mouse{
 		buttonMap: make(map[ebiten.MouseButton]MouseState),

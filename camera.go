@@ -26,6 +26,7 @@ func CreateCamera(width, height float64) *Camera {
 	return c
 }
 
+//SetDimensions sets the width and height of the camera
 func (c *Camera) SetDimensions(width, height float64) {
 	c.Height = height
 	c.Width = width
@@ -83,6 +84,7 @@ func (c *Camera) ChangeZoom() {
 	}
 }
 
+//ZoomIn move the camera closer towards the player
 func (c *Camera) ZoomIn() {
 	if c.zoomCount > 0 {
 		c.zoomCount++
@@ -99,6 +101,7 @@ func (c *Camera) ZoomIn() {
 	}
 }
 
+//ZoomOut moves the camera further away from the player
 func (c *Camera) ZoomOut() {
 	if c.zoomCount > 0 {
 		c.zoomCount++
@@ -135,14 +138,17 @@ func (c Camera) Position() (x, y float64) {
 	return c.x, c.y
 }
 
+//SetX position of the camera
 func (c *Camera) SetX(x float64) {
 	c.x = x
 }
 
+//SetY position of the camera
 func (c *Camera) SetY(y float64) {
 	c.y = y
 }
 
+//SetPosition by passing both x and y coordinates of the camera
 func (c *Camera) SetPosition(x, y float64) {
 	c.x = x
 	c.y = y

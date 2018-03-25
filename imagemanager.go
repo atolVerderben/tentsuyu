@@ -2,6 +2,8 @@ package tentsuyu
 
 import (
 	"image"
+	//I want to accept png and jpg files by default
+	_ "image/jpeg"
 	_ "image/png"
 	"os"
 

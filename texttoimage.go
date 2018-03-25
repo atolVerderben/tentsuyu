@@ -11,6 +11,7 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
+//RenderTextToImage takes a given slice of strings and returns a pointer to an ebiten.Image
 func RenderTextToImage(text []string, w, h int, fntSize float64, fnt *truetype.Font, textColor color.Color) (*ebiten.Image, error) {
 
 	drawImage, err := ebiten.NewImage(w, h, ebiten.FilterNearest)

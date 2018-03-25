@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+//TextBox represents a large text area
 type TextBox struct {
 	*BasicUIElement
 	Text      *TextElement
@@ -15,6 +16,7 @@ type TextBox struct {
 	delayTick int
 }
 
+//NewTextBox returns a pointer to a TextBox struct using the given parameters
 func NewTextBox(x, y float64, w, h int, font *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextBox {
 	tb := &TextBox{
 		Text:           NewTextElement(x, y, w, h, font, text, textColor, fntSize),
@@ -23,6 +25,7 @@ func NewTextBox(x, y float64, w, h int, font *truetype.Font, text []string, text
 	return tb
 }
 
+//Update the TextBox checkts whether it is selecter and what keystrokes have happened
 func (tb *TextBox) Update() {
 
 	tb.Text.Update()
@@ -319,6 +322,7 @@ func (tb *TextBox) Update() {
 
 }
 
+//Draw the textbox
 func (tb *TextBox) Draw(screen *ebiten.Image) error {
 	return tb.Text.Draw(screen)
 }

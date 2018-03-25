@@ -10,7 +10,7 @@ import (
 
 //SpriteSheet holds all frames of a spritesheet from a json
 type SpriteSheet struct {
-	Frames                                []*Frame `json:"frames"`
+	Frames                                []Frame `json:"frames"`
 	framePaddingWidth, framePaddingHeight int
 }
 
@@ -26,20 +26,21 @@ type Frame struct {
 }
 
 //ReadSpriteSheet reads a json file and returns a SpriteSheet struct
-func ReadSpriteSheet(filename string) *SpriteSheet {
+func ReadSpriteSheet(filename string) SpriteSheet {
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println(err.Error())
 		os.Exit(1)
 	}
 
-	m := &SpriteSheet{}
+	m := SpriteSheet{}
 	json.Unmarshal(raw, m)
 	return m
 }
 
-func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWidth, paddingHeight int) *SpriteSheet {
-	s := &SpriteSheet{}
+//NewSpriteSheet returns a SpriteSheet struct with just a basic 
+func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWidth, paddingHeight int) SpriteSheet {
+	s := SpriteSheet{}
 
 	for height := 0 + paddingHeight; height <= imageHeight; height += paddingHeight + frameHeight {
 		for width := 0 + paddingWidth; width <= imageWidth; width += paddingWidth + frameWidth {
@@ -48,7 +49,7 @@ func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWid
 			frame["y"] = height
 			frame["w"] = frameWidth
 			frame["h"] = frameHeight
-			s.Frames = append(s.Frames, &Frame{
+			s.Frames = append(s.Frames, Frame{
 				Filename: "Frame" + strconv.Itoa(height+width),
 				Frame:    frame,
 			})

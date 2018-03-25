@@ -62,6 +62,7 @@ func OnScreen(x, y float64, width, height int) bool {
 	return Components.Camera.OnScreen(x, y, width, height)
 }
 
+//Collision returns true if two given BasicObjects are overlapping
 func Collision(obj1 *BasicObject, obj2 *BasicObject) bool {
 	//Objects are to the left of each other
 	if obj1.Left() > obj2.Right() || obj2.Left() > obj1.Right() {
@@ -73,6 +74,7 @@ func Collision(obj1 *BasicObject, obj2 *BasicObject) bool {
 	return true
 }
 
+//Collision2D uses the collision2d library to get a more accurate collision detail
 func Collision2D(obj1 *BasicObject, obj2 *BasicObject) (bool, collision2d.Response) {
 	if Collision(obj1, obj2) {
 

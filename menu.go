@@ -42,19 +42,23 @@ func (m *Menu) SetBackground(src *ebiten.Image, imgParts *BasicImageParts) {
 	m.backgroundImgParts = imgParts
 }
 
+//SelectHorizontal moves the selection alrong the x-axis
 func (m *Menu) SelectHorizontal(id int) {
 	m.selectedCol = 0
 	m.selectedRow = id
 }
 
+//SelectVertical move the selection along the y-axis
 func (m *Menu) SelectVertical(id int) {
 	m.selectedCol = id
 }
 
+//ReturnSelected returns the Row and Col int of the current selected option
 func (m *Menu) ReturnSelected() (int, int) {
 	return m.selectedRow, m.selectedCol
 }
 
+//PressSelected exectures the Action of the currently selected option
 func (m *Menu) PressSelected() {
 	if m.selectedCol == -1 || m.selectedRow == -1 {
 		return
@@ -189,6 +193,7 @@ func (m *Menu) AddElement(element []UIElement, action []func()) {
 	m.Elements = append(m.Elements, MenuElements)
 }
 
+//MenuElement represents a single element/option within a menu
 type MenuElement struct {
 	UIElement
 	Action                  func()
