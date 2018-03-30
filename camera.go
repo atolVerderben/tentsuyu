@@ -1,6 +1,11 @@
 package tentsuyu
 
-import "github.com/hajimehoshi/ebiten"
+import (
+	"math"
+	"math/rand"
+
+	"github.com/hajimehoshi/ebiten"
+)
 
 //Camera is the entity that follows our player so he doesn't walk off screen
 type Camera struct {
@@ -8,6 +13,8 @@ type Camera struct {
 	zoomCount, zoomCountMax                                        int
 	FreeFloating                                                   bool
 	MaxZoomOut, MaxZoomIn                                          float64
+	startShaking, isShaking                                        bool
+	shakeAngle, shakeRadius                                        float64
 }
 
 //CreateCamera intializes a camera struct
@@ -226,5 +233,54 @@ func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64
 		} else { // Stop at top
 			c.y = 0
 		}
+	}
+	if c.isShaking {
+		c.Shake()
+	}
+}
+
+/*
+viewportCentre = (400,300) //Lets say screen size is 800 x 600
+radius = 30.0
+randomAngle = rand()%360
+offset = ( sin(randomAngle) * radius , cos(randomAngle) * radius) //create offset 2d vector
+viewport.setCentre(viewportCentre + offset) // set centre of viewport
+draw()
+
+while(true)  //update about every 10-20ms
+{
+    radius *=0.9 //diminish radius each frame
+    randomAngle +=(180 +\- rand()%60) //pick new angle
+    offset = (sin(randomAngle) * radius , cos(randomAngle) * radius) //create offset 2d vector
+    viewport.setCentre(viewportCentre + offset) //set centre of viewport
+    draw() //redraw
+}
+*/
+
+func (c *Camera) StartShaking() {
+	c.startShaking = true
+	c.isShaking = true
+}
+
+func (c *Camera) Shake() {
+	if c.startShaking {
+		c.shakeRadius = 30.0
+		c.shakeAngle = rand.Float64() * math.Pi * 2
+		offsetX := math.Sin(c.shakeAngle) * c.shakeRadius
+		offsetY := math.Cos(c.shakeAngle) * c.shakeRadius
+		c.y += offsetY
+		c.x += offsetX
+		c.startShaking = false
+	}
+
+	if c.shakeRadius >= 2.0 {
+		c.shakeRadius *= 0.9
+		c.shakeAngle += (150 + rand.Float64()*1.0472)
+		offsetX := math.Sin(c.shakeAngle) * c.shakeRadius
+		offsetY := math.Cos(c.shakeAngle) * c.shakeRadius
+		c.y += offsetY
+		c.x += offsetX
+	} else {
+		c.isShaking = false
 	}
 }
