@@ -3,6 +3,8 @@ package tentsuyu
 import (
 	"math"
 
+	"github.com/rs/xid"
+
 	"github.com/Tarliton/collision2d"
 	"github.com/hajimehoshi/ebiten"
 )
@@ -23,13 +25,14 @@ type GameObject interface {
 
 //BasicObject is the bare implementation of a GameObject
 type BasicObject struct {
-	X, Y, Angle, Speed float64
-	VX, VY             float64
-	NotCentered        bool
-	Width, Height      int
-	IsCircle           bool
-	Box                collision2d.Box
-	Circle             collision2d.Circle
+	X, Y, Angle, Speed, PrevX, PrevY float64
+	VX, VY                           float64
+	NotCentered                      bool
+	Width, Height                    int
+	IsCircle                         bool
+	Box                              collision2d.Box
+	Circle                           collision2d.Circle
+	ID                               xid.ID
 }
 
 //SetCollision2D will allow the object to use more advanced collision functions
@@ -51,10 +54,12 @@ func (obj *BasicObject) SetCollision2D(isCircle bool) {
 //========================================================
 //Implement GameObject
 
+//GetSpeed returns the BasicObject speed
 func (obj *BasicObject) GetSpeed() float64 {
 	return obj.Speed
 }
 
+//GetVelocity returns Vx and Vy of the BasicObject
 func (obj *BasicObject) GetVelocity() (float64, float64) {
 	//vecX, vecY := math.Cos(obj.Angle)*obj.Speed, math.Sin(obj.Angle)*obj.Speed
 	return obj.VX, obj.VY //vecX, vecY
@@ -144,10 +149,31 @@ func (obj *BasicObject) AddY(vY float64) {
 }
 
 //NewBasicObject returns a new oject
-func NewBasicObject() *BasicObject {
-	obj := &BasicObject{}
+func NewBasicObject(x, y float64, w, h int) *BasicObject {
+	obj := &BasicObject{
+		ID:     xid.New(),
+		X:      x,
+		Y:      y,
+		Width:  w,
+		Height: h,
+	}
 
 	return obj
+}
+
+//GetID returns the guid of the Basic Object
+func (obj BasicObject) GetID() xid.ID {
+	return obj.ID
+}
+
+//GetIDasString returns the string representation of the guid
+func (obj BasicObject) GetIDasString() string {
+	return obj.ID.String()
+}
+
+//SetID sets the BasicObject's ID to a new guid
+func (obj *BasicObject) SetID() {
+	obj.ID = xid.New()
 }
 
 //Left edge of the rectangle
@@ -206,35 +232,35 @@ func (obj *BasicObject) Contains(srcX, srcY float64) bool {
 	return xIn && yIn
 }
 
-//Left edge of the rectangle
+//LeftNoCenter edge of the rectangle
 func (obj *BasicObject) LeftNoCenter() float64 {
 	x, _ := obj.GetPosition()
 	return x
 
 }
 
-//Right edge of the rectangle
+//RightNoCenter edge of the rectangle
 func (obj *BasicObject) RightNoCenter() float64 {
 	x, _ := obj.GetPosition()
 	return x + float64(obj.GetWidth())
 
 }
 
-//Top edge of the rectangle
+//TopNoCenter edge of the rectangle
 func (obj *BasicObject) TopNoCenter() float64 {
 	_, y := obj.GetPosition()
 	return y
 
 }
 
-//Bottom edge of the rectangle
+//BottomNoCenter edge of the rectangle
 func (obj *BasicObject) BottomNoCenter() float64 {
 	_, y := obj.GetPosition()
 	return y + float64(obj.GetHeight())
 
 }
 
-//Contains returns true if the given point is withing the rectangle of the object
+//ContainsNoCenter returns true if the given point is withing the rectangle of the object
 func (obj *BasicObject) ContainsNoCenter(srcX, srcY float64) bool {
 
 	xIn, yIn := false, false
@@ -247,6 +273,7 @@ func (obj *BasicObject) ContainsNoCenter(srcX, srcY float64) bool {
 	return xIn && yIn
 }
 
+//GetHealth should return BasicObject Health
 func (obj *BasicObject) GetHealth() float64 {
 	return 1.0
 }

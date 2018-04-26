@@ -257,14 +257,16 @@ while(true)  //update about every 10-20ms
 }
 */
 
+//StartShaking begins the camera shake
 func (c *Camera) StartShaking() {
 	c.startShaking = true
 	c.isShaking = true
 }
 
+//Shake shakes the camera
 func (c *Camera) Shake() {
 	if c.startShaking {
-		c.shakeRadius = 30.0
+		c.shakeRadius = 60.0
 		c.shakeAngle = rand.Float64() * math.Pi * 2
 		offsetX := math.Sin(c.shakeAngle) * c.shakeRadius
 		offsetY := math.Cos(c.shakeAngle) * c.shakeRadius
@@ -273,7 +275,7 @@ func (c *Camera) Shake() {
 		c.startShaking = false
 	}
 
-	if c.shakeRadius >= 2.0 {
+	if c.shakeRadius >= 0.2 {
 		c.shakeRadius *= 0.9
 		c.shakeAngle += (150 + rand.Float64()*1.0472)
 		offsetX := math.Sin(c.shakeAngle) * c.shakeRadius

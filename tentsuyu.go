@@ -97,5 +97,5 @@ func Collision2D(obj1 *BasicObject, obj2 *BasicObject) (bool, collision2d.Respon
 	obj2.Box.Pos = collision2d.NewVector(obj2.X, obj2.Y)
 	return collision2d.TestPolygonPolygon(obj1.Box.ToPolygon(), obj2.Box.ToPolygon())
 	//}
-	return false, collision2d.NewResponse()
+	//return false, collision2d.NewResponse()
 }
