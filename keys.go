@@ -53,9 +53,13 @@ func (km *KeyManager) Set(k ebiten.Key, state bool) {
 // Get retrieves a keys state.
 func (km *KeyManager) Get(k ebiten.Key) KeyState {
 	km.mutex.RLock()
-	ks := km.mapper[k]
+	ks := KeyState{}
+	if val, ok := km.mapper[k]; ok {
+		ks = val
+	} else {
+		km.AddKey(k)
+	}
 	km.mutex.RUnlock()
-
 	return ks
 }
 

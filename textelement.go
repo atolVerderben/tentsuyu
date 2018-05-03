@@ -187,6 +187,23 @@ func (t *TextElement) Draw(screen *ebiten.Image) error {
 	return nil
 }
 
+//DrawApplyZoom the TextElement
+func (t *TextElement) DrawApplyZoom(screen *ebiten.Image) error {
+	if t.visible == false {
+		return nil
+	}
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(t.GetPosition())
+	//GameCamera.DrawCameraTransform(op)
+	if !t.Stationary {
+		ApplyCameraTransform(op, true)
+	}
+	if err := screen.DrawImage(t.drawImage, op); err != nil {
+		return err
+	}
+	return nil
+}
+
 func testEq(a, b []string) bool {
 
 	if a == nil && b == nil {
