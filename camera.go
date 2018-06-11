@@ -29,6 +29,7 @@ func CreateCamera(width, height float64) *Camera {
 		FreeFloating: false,
 		MaxZoomOut:   0.1,
 		MaxZoomIn:    2.0,
+		shakeRadius:  60.0,
 	}
 	return c
 }
@@ -239,34 +240,81 @@ func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64
 	}
 }
 
-/*
-viewportCentre = (400,300) //Lets say screen size is 800 x 600
-radius = 30.0
-randomAngle = rand()%360
-offset = ( sin(randomAngle) * radius , cos(randomAngle) * radius) //create offset 2d vector
-viewport.setCentre(viewportCentre + offset) // set centre of viewport
-draw()
+//FollowPlayer follows the specified character (in this case the player)
+func (c *Camera) FollowObject(player GameObject, worldWidth, worldHeight float64) {
 
-while(true)  //update about every 10-20ms
-{
-    radius *=0.9 //diminish radius each frame
-    randomAngle +=(180 +\- rand()%60) //pick new angle
-    offset = (sin(randomAngle) * radius , cos(randomAngle) * radius) //create offset 2d vector
-    viewport.setCentre(viewportCentre + offset) //set centre of viewport
-    draw() //redraw
+	//c.ChangeZoom()
+
+	worldHeight *= c.Zoom
+	worldWidth *= c.Zoom
+	cameraOverWidth, cameraOverHeight := false, false
+	if worldWidth < c.ScreenWidth {
+		//c.x = 0
+		//c.y = 0
+		//c.Center(worldWidth/2, worldHeight/2)
+		c.CenterX(worldWidth / 2)
+		cameraOverWidth = true
+
+	}
+	if worldHeight < c.ScreenHeight {
+		c.CenterY(worldHeight / 2)
+		cameraOverHeight = true
+
+	}
+	if cameraOverHeight && cameraOverWidth {
+		return
+	}
+	x, y := player.GetPosition()
+	x, y = x*c.Zoom, y*c.Zoom
+
+	// X-Axis
+	if !cameraOverWidth {
+		// Follow Player Freely
+		if x-c.Width/2 > 0 && x+c.Width/2 < worldWidth {
+			c.x = (x - c.Width/2)
+		} else if x+c.Width/2 >= worldWidth { // Stop at right edge
+			c.x = worldWidth - c.Width
+		} else { // Stop at left edge
+			c.x = 0
+		}
+	}
+
+	// Y-Axis
+	if !cameraOverHeight {
+		// Follow Player Freely
+		if y-c.Height/2 > 0 && y+c.Height/2 < worldHeight {
+			c.y = y - c.Height/2
+		} else if y+c.Height/2 >= worldHeight { // Stop at bottom
+			c.y = worldHeight - c.Height
+		} else { // Stop at top
+			c.y = 0
+		}
+	}
+	if c.isShaking {
+		c.Shake()
+	}
 }
-*/
 
 //StartShaking begins the camera shake
-func (c *Camera) StartShaking() {
+func (c *Camera) StartShaking(severe bool) {
+	if severe {
+		c.shakeRadius = 60.0
+	} else {
+		c.shakeRadius = 5.0
+	}
 	c.startShaking = true
 	c.isShaking = true
 }
 
+func (c *Camera) SetShakeRadius(radius float64) {
+	c.shakeRadius = radius
+}
+
 //Shake shakes the camera
 func (c *Camera) Shake() {
+
 	if c.startShaking {
-		c.shakeRadius = 60.0
+
 		c.shakeAngle = rand.Float64() * math.Pi * 2
 		offsetX := math.Sin(c.shakeAngle) * c.shakeRadius
 		offsetY := math.Cos(c.shakeAngle) * c.shakeRadius
@@ -285,4 +333,8 @@ func (c *Camera) Shake() {
 	} else {
 		c.isShaking = false
 	}
+}
+
+func (c *Camera) ShakeALittle() {
+
 }

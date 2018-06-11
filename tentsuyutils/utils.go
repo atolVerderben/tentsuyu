@@ -1,4 +1,4 @@
-package tesntsuyutils
+package tentsuyutils
 
 //NearCoords tests if (x,y) are "near" (x1, y1) based on radius
 func NearCoords(x, y, x1, y1, radius float64) bool {
