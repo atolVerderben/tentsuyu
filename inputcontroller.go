@@ -4,11 +4,12 @@ import "github.com/hajimehoshi/ebiten"
 
 //InputController controls all input for the game
 type InputController struct {
-	drawCursor   bool
-	keyManager   *KeyManager
-	buttons      map[string]Button
-	mouseButtons map[string]MouseButton
-	*Mouse
+	drawCursor            bool
+	keyManager            *KeyManager
+	buttons               map[string]Button
+	mouseButtons          map[string]MouseButton
+	Mouse                 *Mouse
+	keyDelay, keyInterval float64
 }
 
 //NewInputController returns a new InputController
@@ -19,6 +20,8 @@ func NewInputController() *InputController {
 		keyManager:   NewKeyManager(),
 		drawCursor:   true,
 		Mouse:        NewMouse(),
+		keyDelay:     30,
+		keyInterval:  3,
 	}
 	ic.RegisterMouseButton("LeftMouse", ebiten.MouseButtonLeft)
 	ic.RegisterMouseButton("RightMouse", ebiten.MouseButtonRight)
@@ -75,12 +78,12 @@ func NewInputController() *InputController {
 
 //LeftClick returns the Mouse left click button
 func (ic *InputController) LeftClick() MouseState {
-	return ic.buttonMap[ebiten.MouseButtonLeft]
+	return ic.Mouse.buttonMap[ebiten.MouseButtonLeft]
 }
 
 //RightClick returns the Mouse left click button
 func (ic *InputController) RightClick() MouseState {
-	return ic.buttonMap[ebiten.MouseButtonRight]
+	return ic.Mouse.buttonMap[ebiten.MouseButtonRight]
 }
 
 //GetMouseCoords returns the ebiten mouse coords

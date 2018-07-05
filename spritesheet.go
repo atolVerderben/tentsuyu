@@ -26,21 +26,21 @@ type Frame struct {
 }
 
 //ReadSpriteSheet reads a json file and returns a SpriteSheet struct
-func ReadSpriteSheet(filename string) SpriteSheet {
+func ReadSpriteSheet(filename string) *SpriteSheet {
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Println(err.Error())
 		os.Exit(1)
 	}
 
-	m := SpriteSheet{}
+	m := &SpriteSheet{}
 	json.Unmarshal(raw, m)
 	return m
 }
 
-//NewSpriteSheet returns a SpriteSheet struct with just a basic 
-func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWidth, paddingHeight int) SpriteSheet {
-	s := SpriteSheet{}
+//NewSpriteSheet returns a SpriteSheet struct with just a basic
+func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWidth, paddingHeight int) *SpriteSheet {
+	s := &SpriteSheet{}
 
 	for height := 0 + paddingHeight; height <= imageHeight; height += paddingHeight + frameHeight {
 		for width := 0 + paddingWidth; width <= imageWidth; width += paddingWidth + frameWidth {
