@@ -5,7 +5,6 @@ import (
 
 	"github.com/rs/xid"
 
-	"github.com/Tarliton/collision2d"
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -29,9 +28,6 @@ type BasicObject struct {
 	VX, VY                           float64
 	NotCentered                      bool
 	Width, Height                    int
-	IsCircle                         bool
-	Box                              collision2d.Box
-	Circle                           collision2d.Circle
 	ID                               xid.ID
 }
 
@@ -41,13 +37,6 @@ func (obj *BasicObject) SetCollision2D(isCircle bool) {
 	if obj.NotCentered {
 		x += float64(obj.Width) / 2
 		y += float64(obj.Height) / 2
-	}
-
-	if isCircle {
-		obj.IsCircle = isCircle
-		obj.Circle = collision2d.NewCircle(collision2d.NewVector(x, y), float64(obj.Width))
-	} else {
-		obj.Box = collision2d.NewBox(collision2d.NewVector(x, y), float64(obj.Width), float64(obj.Height))
 	}
 }
 
@@ -90,8 +79,6 @@ func (obj *BasicObject) AddPosition(vX, vY float64) {
 func (obj *BasicObject) SetPosition(x, y float64) {
 	obj.X = x
 	obj.Y = y
-	obj.Box.Pos.X = obj.X
-	obj.Box.Pos.Y = obj.Y
 }
 
 //SetSize with width , height
