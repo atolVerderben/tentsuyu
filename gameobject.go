@@ -3,7 +3,8 @@ package tentsuyu
 import (
 	"math"
 
-	"github.com/Tarliton/collision2d"
+	"github.com/rs/xid"
+
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -23,13 +24,11 @@ type GameObject interface {
 
 //BasicObject is the bare implementation of a GameObject
 type BasicObject struct {
-	X, Y, Angle, Speed float64
-	VX, VY             float64
-	NotCentered        bool
-	Width, Height      int
-	IsCircle           bool
-	Box                collision2d.Box
-	Circle             collision2d.Circle
+	X, Y, Angle, Speed, PrevX, PrevY float64
+	VX, VY                           float64
+	NotCentered                      bool
+	Width, Height                    int
+	ID                               xid.ID
 }
 
 //SetCollision2D will allow the object to use more advanced collision functions
@@ -39,22 +38,17 @@ func (obj *BasicObject) SetCollision2D(isCircle bool) {
 		x += float64(obj.Width) / 2
 		y += float64(obj.Height) / 2
 	}
-
-	if isCircle {
-		obj.IsCircle = isCircle
-		obj.Circle = collision2d.NewCircle(collision2d.NewVector(x, y), float64(obj.Width))
-	} else {
-		obj.Box = collision2d.NewBox(collision2d.NewVector(x, y), float64(obj.Width), float64(obj.Height))
-	}
 }
 
 //========================================================
 //Implement GameObject
 
+//GetSpeed returns the BasicObject speed
 func (obj *BasicObject) GetSpeed() float64 {
 	return obj.Speed
 }
 
+//GetVelocity returns Vx and Vy of the BasicObject
 func (obj *BasicObject) GetVelocity() (float64, float64) {
 	//vecX, vecY := math.Cos(obj.Angle)*obj.Speed, math.Sin(obj.Angle)*obj.Speed
 	return obj.VX, obj.VY //vecX, vecY
@@ -85,8 +79,6 @@ func (obj *BasicObject) AddPosition(vX, vY float64) {
 func (obj *BasicObject) SetPosition(x, y float64) {
 	obj.X = x
 	obj.Y = y
-	obj.Box.Pos.X = obj.X
-	obj.Box.Pos.Y = obj.Y
 }
 
 //SetSize with width , height
@@ -144,10 +136,31 @@ func (obj *BasicObject) AddY(vY float64) {
 }
 
 //NewBasicObject returns a new oject
-func NewBasicObject() *BasicObject {
-	obj := &BasicObject{}
+func NewBasicObject(x, y float64, w, h int) *BasicObject {
+	obj := &BasicObject{
+		ID:     xid.New(),
+		X:      x,
+		Y:      y,
+		Width:  w,
+		Height: h,
+	}
 
 	return obj
+}
+
+//GetID returns the guid of the Basic Object
+func (obj BasicObject) GetID() xid.ID {
+	return obj.ID
+}
+
+//GetIDasString returns the string representation of the guid
+func (obj BasicObject) GetIDasString() string {
+	return obj.ID.String()
+}
+
+//SetID sets the BasicObject's ID to a new guid
+func (obj *BasicObject) SetID() {
+	obj.ID = xid.New()
 }
 
 //Left edge of the rectangle
@@ -206,35 +219,35 @@ func (obj *BasicObject) Contains(srcX, srcY float64) bool {
 	return xIn && yIn
 }
 
-//Left edge of the rectangle
+//LeftNoCenter edge of the rectangle
 func (obj *BasicObject) LeftNoCenter() float64 {
 	x, _ := obj.GetPosition()
 	return x
 
 }
 
-//Right edge of the rectangle
+//RightNoCenter edge of the rectangle
 func (obj *BasicObject) RightNoCenter() float64 {
 	x, _ := obj.GetPosition()
 	return x + float64(obj.GetWidth())
 
 }
 
-//Top edge of the rectangle
+//TopNoCenter edge of the rectangle
 func (obj *BasicObject) TopNoCenter() float64 {
 	_, y := obj.GetPosition()
 	return y
 
 }
 
-//Bottom edge of the rectangle
+//BottomNoCenter edge of the rectangle
 func (obj *BasicObject) BottomNoCenter() float64 {
 	_, y := obj.GetPosition()
 	return y + float64(obj.GetHeight())
 
 }
 
-//Contains returns true if the given point is withing the rectangle of the object
+//ContainsNoCenter returns true if the given point is withing the rectangle of the object
 func (obj *BasicObject) ContainsNoCenter(srcX, srcY float64) bool {
 
 	xIn, yIn := false, false
@@ -247,6 +260,7 @@ func (obj *BasicObject) ContainsNoCenter(srcX, srcY float64) bool {
 	return xIn && yIn
 }
 
+//GetHealth should return BasicObject Health
 func (obj *BasicObject) GetHealth() float64 {
 	return 1.0
 }
@@ -259,59 +273,4 @@ func (obj *BasicObject) Update() {
 //Draw for GameObject
 func (obj *BasicObject) Draw(screen *ebiten.Image) error {
 	return nil
-}
-
-//======================
-//Image Parts
-//======================
-
-//BasicImageParts is easy to set up basic sprite image
-type BasicImageParts struct {
-	name                                         string
-	Width, Height, Sx, Sy, DestWidth, DestHeight int
-	Reverse                                      bool
-}
-
-func NewBasicImageParts(sx, sy, width, height int) *BasicImageParts {
-	b := &BasicImageParts{
-		Sx:         sx,
-		Sy:         sy,
-		Width:      width,
-		Height:     height,
-		DestHeight: height,
-		DestWidth:  width,
-	}
-	return b
-}
-
-func (b *BasicImageParts) SetDestinationDimensions(width, height int) {
-	b.DestWidth = width
-	b.DestHeight = height
-}
-
-func (b *BasicImageParts) ReverseX(reverse bool) {
-	b.Reverse = reverse
-}
-
-//Len returns 1
-func (b *BasicImageParts) Len() int {
-	return 1
-}
-
-//Dst we just make it 1:1
-func (b *BasicImageParts) Dst(i int) (x0, y0, x1, y1 int) {
-	if b.DestHeight == 0 && b.DestWidth == 0 {
-		return 0, 0, b.Width, b.Height
-	}
-	return 0, 0, b.DestWidth, b.DestHeight
-}
-
-//Src cuts out the specified rectangle from the source image to display the sprite
-func (b *BasicImageParts) Src(i int) (x0, y0, x1, y1 int) {
-	x := b.Sx
-	y := b.Sy
-	if b.Reverse {
-		return x + b.Width, y, x, y + b.Height
-	}
-	return x, y, x + b.Width, y + b.Height
 }

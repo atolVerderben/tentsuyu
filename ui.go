@@ -226,11 +226,11 @@ func (nd *UINumberDisplay) Update() {
 }
 
 //NewUINumberDisplay creates a new UINumberDisplay
-func NewUINumberDisplay(number *float64, x, y float64, w, h int, font *truetype.Font, textColor color.Color) *UINumberDisplay {
+func NewUINumberDisplay(number *float64, x, y float64, w, h int, font *truetype.Font, textColor color.Color, fntSize float64) *UINumberDisplay {
 	nd := &UINumberDisplay{
 		currNumber:  number,
 		prevNumber:  *number,
-		TextElement: NewTextElement(x, y, w, h, font, []string{strconv.Itoa(int(*number))}, textColor, 24),
+		TextElement: NewTextElement(x, y, w, h, font, []string{strconv.Itoa(int(*number))}, textColor, fntSize),
 	}
 	return nd
 }

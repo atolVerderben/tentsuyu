@@ -107,7 +107,7 @@ func (m *Menu) Draw(screen *ebiten.Image) {
 		//w := 50.0 //float64(m.maxWidth) / 2
 		//h := 50.0 //float64(m.maxHeight) / 2
 		scalex := float64(m.maxWidth)/100 + .85
-		scaley := float64(m.maxHeight)/40 + .2
+		scaley := float64(m.maxHeight)/100 + .2
 		op := &ebiten.DrawImageOptions{}
 		op.ImageParts = m.backgroundImgParts
 		//op.GeoM.Translate(-w, -h)

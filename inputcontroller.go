@@ -4,11 +4,12 @@ import "github.com/hajimehoshi/ebiten"
 
 //InputController controls all input for the game
 type InputController struct {
-	drawCursor   bool
-	keyManager   *KeyManager
-	buttons      map[string]Button
-	mouseButtons map[string]MouseButton
-	*Mouse
+	drawCursor            bool
+	keyManager            *KeyManager
+	buttons               map[string]Button
+	mouseButtons          map[string]MouseButton
+	Mouse                 *Mouse
+	keyDelay, keyInterval float64
 }
 
 //NewInputController returns a new InputController
@@ -19,68 +20,24 @@ func NewInputController() *InputController {
 		keyManager:   NewKeyManager(),
 		drawCursor:   true,
 		Mouse:        NewMouse(),
+		keyDelay:     30,
+		keyInterval:  3,
 	}
 	ic.RegisterMouseButton("LeftMouse", ebiten.MouseButtonLeft)
 	ic.RegisterMouseButton("RightMouse", ebiten.MouseButtonRight)
 	ic.RegisterMouseButton("MiddleMouse", ebiten.MouseButtonMiddle)
-	ic.RegisterButton("TextBox0", ebiten.Key0)
-	ic.RegisterButton("TextBox1", ebiten.Key1)
-	ic.RegisterButton("TextBox2", ebiten.Key2)
-	ic.RegisterButton("TextBox3", ebiten.Key3)
-	ic.RegisterButton("TextBox4", ebiten.Key4)
-	ic.RegisterButton("TextBox5", ebiten.Key5)
-	ic.RegisterButton("TextBox6", ebiten.Key6)
-	ic.RegisterButton("TextBox7", ebiten.Key7)
-	ic.RegisterButton("TextBox8", ebiten.Key8)
-	ic.RegisterButton("TextBox9", ebiten.Key9)
-	ic.RegisterButton("TextBoxPeriod", ebiten.KeyPeriod)
-	ic.RegisterButton("TextBoxSpace", ebiten.KeySpace)
-	ic.RegisterButton("TextBoxBackspace", ebiten.KeyBackspace)
-	ic.RegisterButton("TextBoxEnter", ebiten.KeyEnter)
-	ic.RegisterButton("TextBoxSemiColon", ebiten.KeySemicolon)
-	ic.RegisterButton("TextBoxShift", ebiten.KeyShift)
 
-	ic.RegisterButton("TextBoxSlash", ebiten.KeySlash)
-	ic.RegisterButton("TextBoxBackSlash", ebiten.KeyBackslash)
-
-	//Letters
-	ic.RegisterButton("TextBoxA", ebiten.KeyA)
-	ic.RegisterButton("TextBoxB", ebiten.KeyB)
-	ic.RegisterButton("TextBoxC", ebiten.KeyC)
-	ic.RegisterButton("TextBoxD", ebiten.KeyD)
-	ic.RegisterButton("TextBoxE", ebiten.KeyE)
-	ic.RegisterButton("TextBoxF", ebiten.KeyF)
-	ic.RegisterButton("TextBoxG", ebiten.KeyG)
-	ic.RegisterButton("TextBoxH", ebiten.KeyH)
-	ic.RegisterButton("TextBoxI", ebiten.KeyI)
-	ic.RegisterButton("TextBoxJ", ebiten.KeyJ)
-	ic.RegisterButton("TextBoxK", ebiten.KeyK)
-	ic.RegisterButton("TextBoxL", ebiten.KeyL)
-	ic.RegisterButton("TextBoxM", ebiten.KeyM)
-	ic.RegisterButton("TextBoxN", ebiten.KeyN)
-	ic.RegisterButton("TextBoxO", ebiten.KeyO)
-	ic.RegisterButton("TextBoxP", ebiten.KeyP)
-	ic.RegisterButton("TextBoxQ", ebiten.KeyQ)
-	ic.RegisterButton("TextBoxR", ebiten.KeyR)
-	ic.RegisterButton("TextBoxS", ebiten.KeyS)
-	ic.RegisterButton("TextBoxT", ebiten.KeyT)
-	ic.RegisterButton("TextBoxU", ebiten.KeyU)
-	ic.RegisterButton("TextBoxV", ebiten.KeyV)
-	ic.RegisterButton("TextBoxW", ebiten.KeyW)
-	ic.RegisterButton("TextBoxX", ebiten.KeyX)
-	ic.RegisterButton("TextBoxY", ebiten.KeyY)
-	ic.RegisterButton("TextBoxZ", ebiten.KeyZ)
 	return ic
 }
 
 //LeftClick returns the Mouse left click button
 func (ic *InputController) LeftClick() MouseState {
-	return ic.buttonMap[ebiten.MouseButtonLeft]
+	return ic.Mouse.buttonMap[ebiten.MouseButtonLeft]
 }
 
 //RightClick returns the Mouse left click button
 func (ic *InputController) RightClick() MouseState {
-	return ic.buttonMap[ebiten.MouseButtonRight]
+	return ic.Mouse.buttonMap[ebiten.MouseButtonRight]
 }
 
 //GetMouseCoords returns the ebiten mouse coords
