@@ -4,6 +4,8 @@ import (
 	"math"
 	"math/rand"
 
+	"github.com/atolVerderben/tentsuyu/tentsuyutils"
+
 	"github.com/hajimehoshi/ebiten"
 )
 
@@ -15,21 +17,26 @@ type Camera struct {
 	MaxZoomOut, MaxZoomIn                                          float64
 	startShaking, isShaking                                        bool
 	shakeAngle, shakeRadius                                        float64
+	preShakeX, preShakeY                                           float64
+	destX, destY                                                   float64
+	freeFloatSpeed                                                 float64
+	moving                                                         bool
 }
 
 //CreateCamera intializes a camera struct
 func CreateCamera(width, height float64) *Camera {
 	c := &Camera{
-		Height:       height,
-		Width:        width,
-		Zoom:         1,
-		zoomCountMax: 1,
-		ScreenHeight: height,
-		ScreenWidth:  width,
-		FreeFloating: false,
-		MaxZoomOut:   0.1,
-		MaxZoomIn:    2.0,
-		shakeRadius:  60.0,
+		Height:         height,
+		Width:          width,
+		Zoom:           1,
+		zoomCountMax:   1,
+		ScreenHeight:   height,
+		ScreenWidth:    width,
+		FreeFloating:   false,
+		MaxZoomOut:     0.1,
+		MaxZoomIn:      2.0,
+		shakeRadius:    60.0,
+		freeFloatSpeed: 2.0,
 	}
 	return c
 }
@@ -89,6 +96,46 @@ func (c *Camera) ChangeZoom() {
 			c.zoomCount++
 		}
 
+	}
+}
+
+func (c *Camera) moveToDestination() {
+	//moveX, moveY := false, false
+	if c.moving {
+		if c.destX != c.x {
+			//moveX = true
+			if c.destX > c.x {
+				c.x += c.freeFloatSpeed
+			} else {
+				c.x -= c.freeFloatSpeed
+			}
+		}
+		if c.destY != c.y {
+			//moveY = true
+			if c.destY > c.y {
+				c.y += c.freeFloatSpeed
+			} else {
+				c.y -= c.freeFloatSpeed
+			}
+		}
+
+		if tentsuyutils.NearCoords(c.x, c.y, c.destX, c.destY, 5) {
+			c.moving = false
+			c.x = c.destX
+			c.y = c.destY
+		}
+
+		/*if moveX && moveY {
+			c.x += c.freeFloatSpeed / 2
+			c.y += c.freeFloatSpeed / 2
+		} else {
+			if moveX {
+				c.x += c.freeFloatSpeed
+			}
+			if moveY {
+				c.y += c.freeFloatSpeed
+			}
+		}*/
 	}
 }
 
@@ -183,6 +230,34 @@ func (c *Camera) DrawCameraTransform(op *ebiten.DrawImageOptions) {
 func (c *Camera) DrawCameraTransformIgnoreZoom(op *ebiten.DrawImageOptions) {
 	op.GeoM.Rotate(c.rotation)
 	op.GeoM.Translate(-c.x, -c.y)
+}
+
+//Update the camera
+func (c *Camera) Update() {
+	if c.startShaking {
+		c.moving = false
+		if !c.isShaking { //retain the preshake coords
+			c.preShakeX = c.x
+			c.preShakeY = c.y
+		}
+		c.shakeAngle = rand.Float64() * math.Pi * 2
+		/*c.shakeAngle = rand.Float64() * math.Pi * 2
+		offsetX := math.Sin(c.shakeAngle) * c.shakeRadius
+		offsetY := math.Cos(c.shakeAngle) * c.shakeRadius
+		c.y += offsetY
+		c.x += offsetX*/
+		c.startShaking = false
+		c.isShaking = true
+	}
+
+	if c.isShaking {
+		c.Shake()
+	}
+
+	if c.moving {
+		c.moveToDestination()
+	}
+
 }
 
 //FollowPlayer follows the specified character (in this case the player)
@@ -300,10 +375,10 @@ func (c *Camera) StartShaking(severe bool) {
 	if severe {
 		c.shakeRadius = 60.0
 	} else {
-		c.shakeRadius = 5.0
+		c.shakeRadius = 4.0
 	}
 	c.startShaking = true
-	c.isShaking = true
+
 }
 
 func (c *Camera) SetShakeRadius(radius float64) {
@@ -313,15 +388,20 @@ func (c *Camera) SetShakeRadius(radius float64) {
 //Shake shakes the camera
 func (c *Camera) Shake() {
 
-	if c.startShaking {
-
+	/*if c.startShaking {
+		if !c.isShaking { //retain the preshake coords
+			c.preShakeX = c.x
+			c.preShakeY = c.y
+		}
+		c.shakeAngle = rand.Float64() * math.Pi * 2
 		c.shakeAngle = rand.Float64() * math.Pi * 2
 		offsetX := math.Sin(c.shakeAngle) * c.shakeRadius
 		offsetY := math.Cos(c.shakeAngle) * c.shakeRadius
 		c.y += offsetY
 		c.x += offsetX
 		c.startShaking = false
-	}
+		c.isShaking = true
+	}*/
 
 	if c.shakeRadius >= 0.2 {
 		c.shakeRadius *= 0.9
@@ -332,6 +412,11 @@ func (c *Camera) Shake() {
 		c.x += offsetX
 	} else {
 		c.isShaking = false
+		c.destX = c.preShakeX
+		c.destY = c.preShakeY
+		c.moving = true
+		//c.x = c.preShakeX
+		//c.y = c.preShakeY
 	}
 }
 

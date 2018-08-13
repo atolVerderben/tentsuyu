@@ -72,3 +72,8 @@ func Collision(obj1 *BasicObject, obj2 *BasicObject) bool {
 	}
 	return true
 }
+
+//Point represents a point in 2D space
+type Point struct {
+	X, Y float64
+}
