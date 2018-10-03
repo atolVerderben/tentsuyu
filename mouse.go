@@ -12,13 +12,16 @@ const (
 	MouseStateJustDown
 	// MouseStateJustUp is a state for when a key was just released
 	MouseStateJustUp
+	// MouseStateWheel is a state for when the mouse wheel is moved
+	MouseStateWheel
 )
 
 //Mouse represents the cursor
 type Mouse struct {
-	X, Y      float64
-	buttonMap map[ebiten.MouseButton]MouseState
-	mutex     sync.RWMutex
+	X, Y             float64
+	buttonMap        map[ebiten.MouseButton]MouseState
+	mutex            sync.RWMutex
+	mouseWheelMoving bool
 }
 
 //Set tells the mouse to press the selected mouse button
@@ -43,7 +46,12 @@ func (m *Mouse) Get(k ebiten.MouseButton) MouseState {
 
 func (m *Mouse) update() {
 	m.X, m.Y = Input.GetMouseCoords() //m.GetGameMouseCoordsNoZoom()
-
+	m.mouseWheelMoving = false
+	wX, wY := ebiten.MouseWheel()
+	if wX != 0 || wY != 0 {
+		//moving the mouse wheel
+		m.mouseWheelMoving = true
+	}
 	for key := range m.buttonMap {
 		if ebiten.IsMouseButtonPressed(key) {
 			m.Set(key, true)

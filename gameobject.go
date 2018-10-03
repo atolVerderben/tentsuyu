@@ -59,6 +59,16 @@ func (obj BasicObject) GetPosition() (float64, float64) {
 	return obj.X, obj.Y
 }
 
+//GetY returns the y coords
+func (obj BasicObject) GetY() float64 {
+	return obj.Y
+}
+
+//GetX returns the x coords
+func (obj BasicObject) GetX() float64 {
+	return obj.X
+}
+
 //GetWidth returns width
 func (obj BasicObject) GetWidth() int {
 	return obj.Width
@@ -266,11 +276,13 @@ func (obj *BasicObject) GetHealth() float64 {
 }
 
 //Update for GameObject
+//This should be overriden by user
 func (obj *BasicObject) Update() {
 
 }
 
 //Draw for GameObject
+//This should be overriden by user
 func (obj *BasicObject) Draw(screen *ebiten.Image) error {
 	return nil
 }

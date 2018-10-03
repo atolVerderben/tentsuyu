@@ -21,6 +21,7 @@ type Camera struct {
 	destX, destY                                                   float64
 	freeFloatSpeed                                                 float64
 	moving                                                         bool
+	zoomingIn bool
 }
 
 //CreateCamera intializes a camera struct
@@ -50,6 +51,10 @@ func (c *Camera) SetDimensions(width, height float64) {
 //SetZoom of the camera
 func (c *Camera) SetZoom(zoom float64) {
 	c.Zoom = zoom
+}
+
+func (c *Camera) SetZoomGradual(zoom float64){
+	
 }
 
 //GetX returns the camera X position

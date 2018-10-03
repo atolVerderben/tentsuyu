@@ -7,6 +7,7 @@ type Animation struct {
 	ImageParts                        *BasicImageParts
 	SpriteSheet                       *SpriteSheet
 	Frames                            []int
+	LoopCompleted                     bool
 }
 
 //NewAnimation takes a spritesheet, []int of frames to play, and speed to return an Animation
@@ -35,6 +36,11 @@ func (a *Animation) Update() {
 			a.currFrame++
 			if a.currFrame >= len(a.Frames) {
 				a.currFrame = 0
+				a.LoopCompleted = true
+			} else {
+				if a.LoopCompleted == true {
+					a.LoopCompleted = false
+				}
 			}
 			a.frameCount = 0
 			a.ImageParts.Sx = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["x"]
@@ -59,6 +65,11 @@ func (a *Animation) SetAnimationSpeed(speed int) {
 func (a *Animation) SetCurrentFrame(frame int) {
 	a.currFrame = frame
 	a.frameCount = 0
+	a.ImageParts.Sx = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["x"]
+	a.ImageParts.Sy = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["y"]
+	a.ImageParts.Width = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["w"]
+	a.ImageParts.Height = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["h"]
+	a.LoopCompleted = false
 }
 
 //Pause the animation
