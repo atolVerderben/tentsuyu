@@ -1,9 +1,14 @@
 package tentsuyu
 
+import (
+	"image"
+)
+
 //BasicImageParts is easy to set up basic sprite image
 type BasicImageParts struct {
 	Width, Height, Sx, Sy, DestWidth, DestHeight int
 	Reverse                                      bool
+	SourceRect                                   *image.Rectangle
 }
 
 //NewBasicImageParts returns a pointer to new BasicImageParts

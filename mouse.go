@@ -19,9 +19,11 @@ const (
 //Mouse represents the cursor
 type Mouse struct {
 	X, Y             float64
+	wX, wY           float64
 	buttonMap        map[ebiten.MouseButton]MouseState
 	mutex            sync.RWMutex
 	mouseWheelMoving bool
+	scroll           int
 }
 
 //Set tells the mouse to press the selected mouse button
@@ -44,6 +46,22 @@ func (m *Mouse) Get(k ebiten.MouseButton) MouseState {
 	return ms
 }
 
+//IsScrollDown returns true if the user is scrolling down on the mouse wheel
+func (m *Mouse) IsScrollDown() bool {
+	if m.scroll < 0 {
+		return true
+	}
+	return false
+}
+
+//IsScrollUp returns true if the user is scrolling up on the mouse wheel
+func (m *Mouse) IsScrollUp() bool {
+	if m.scroll > 0 {
+		return true
+	}
+	return false
+}
+
 func (m *Mouse) update() {
 	m.X, m.Y = Input.GetMouseCoords() //m.GetGameMouseCoordsNoZoom()
 	m.mouseWheelMoving = false
@@ -51,7 +69,28 @@ func (m *Mouse) update() {
 	if wX != 0 || wY != 0 {
 		//moving the mouse wheel
 		m.mouseWheelMoving = true
+		if wX > m.wX {
+			//click left
+		} else if wX < m.wX {
+			//click right
+		} else {
+
+		}
+
+		if wY > m.wY {
+			//scrollUp
+			m.scroll = 1
+		} else if wY < m.wY {
+			//scrollDown
+			m.scroll = -1
+		} else {
+			m.scroll = 0
+		}
+	} else {
+		m.scroll = 0
 	}
+	m.wX = wX
+	m.wY = wY
 	for key := range m.buttonMap {
 		if ebiten.IsMouseButtonPressed(key) {
 			m.Set(key, true)
