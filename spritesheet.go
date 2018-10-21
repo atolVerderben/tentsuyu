@@ -38,6 +38,13 @@ func ReadSpriteSheet(filename string) *SpriteSheet {
 	return m
 }
 
+//ReadSpriteSheetJSON from a byte slice
+func ReadSpriteSheetJSON(jsonByte []byte) *SpriteSheet {
+	m := &SpriteSheet{}
+	json.Unmarshal(jsonByte, m)
+	return m
+}
+
 //NewSpriteSheet returns a SpriteSheet struct with just a basic
 func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWidth, paddingHeight int) *SpriteSheet {
 	s := &SpriteSheet{}
