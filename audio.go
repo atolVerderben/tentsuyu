@@ -2,6 +2,7 @@ package tentsuyu
 
 import (
 	"io/ioutil"
+	"log"
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
@@ -44,25 +45,8 @@ func (p *AudioPlayer) ReturnSongPlayer(name string) *audio.Player {
 }
 
 func NewAudioPlayer() (*AudioPlayer, error) {
-	const bytesPerSample = 4 // TODO: This should be defined in audio package
-	/*s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(assets.ReturnMusic("soaring")))
-	if err != nil {
-		return nil, err
-	}
-	p, err := audio.NewPlayer(audioContext, s)
-	if err != nil {
-		return nil, err
-	}*/
+	const bytesPerSample = 4
 
-	/*s1, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(assets.ReturnSE("ambience")))
-	if err != nil {
-		return nil, err
-	}
-	p1, err := audio.NewPlayer(audioContext, s1)
-	if err != nil {
-		return nil, err
-	}*/
-	//p.SetVolume(0.07)
 	player := &AudioPlayer{
 		audioContext: audioContext,
 		//audioPlayer:  p,
@@ -76,35 +60,26 @@ func NewAudioPlayer() (*AudioPlayer, error) {
 	/*if player.total == 0 {
 		player.total = 1
 	}*/
-	//player.audioPlayer.Play()
-	//player.ambience.Play()
-	//player.ambience.SetVolume(0.08)
-
-	/*for _, se := range player.seSlice {
-		s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(assets.ReturnSE(se)))
-		if err != nil {
-			log.Println(se)
-			log.Fatal(err)
-
-		}
-		b, err := ioutil.ReadAll(s)
-		if err != nil {
-			log.Println(se)
-			log.Fatal(err)
-
-		}
-		player.seBytes[se] = b
-
-	}*/
 
 	return player, nil
 }
 
 func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string) error {
-	b, err := ioutil.ReadFile(filelocation)
+	fb, err := ioutil.ReadFile(filelocation)
 	if err != nil {
 		return err
 	}
+
+	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	b, err := ioutil.ReadAll(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	p.seBytes[name] = b
 	p.seVolume[name] = 0.5
 	return nil
