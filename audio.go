@@ -64,7 +64,7 @@ func NewAudioPlayer() (*AudioPlayer, error) {
 	return player, nil
 }
 
-func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string) error {
+func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string, volume float64) error {
 	fb, err := ioutil.ReadFile(filelocation)
 	if err != nil {
 		return err
@@ -81,7 +81,24 @@ func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string) error {
 	}
 
 	p.seBytes[name] = b
-	p.seVolume[name] = 0.5
+	p.seVolume[name] = volume
+	return nil
+}
+
+func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume float64) error {
+
+	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	b, err := ioutil.ReadAll(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	p.seBytes[name] = b
+	p.seVolume[name] = volume
 	return nil
 }
 
@@ -90,6 +107,19 @@ func (p *AudioPlayer) AddSongFromFile(name, filelocation string) error {
 	if err != nil {
 		return err
 	}
+	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(b))
+	if err != nil {
+		return err
+	}
+	a, err := audio.NewPlayer(audioContext, s)
+	if err != nil {
+		return err
+	}
+	p.songs[name] = a
+	return nil
+}
+
+func (p *AudioPlayer) AddSongFromBytes(name string, b []byte) error {
 	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(b))
 	if err != nil {
 		return err

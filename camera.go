@@ -21,7 +21,10 @@ type Camera struct {
 	destX, destY                                                   float64
 	freeFloatSpeed                                                 float64
 	moving                                                         bool
-	zoomingIn bool
+	zoomingIn                                                      bool
+	offSetX, offSetY                                               float64
+	lowerBoundX, upperBoundX                                       float64
+	lowerBoundY, upperBoundY                                       float64
 }
 
 //CreateCamera intializes a camera struct
@@ -42,6 +45,14 @@ func CreateCamera(width, height float64) *Camera {
 	return c
 }
 
+//SetBounds that the camera operates in
+func (c *Camera) SetBounds(lowerX, upperX, lowerY, upperY float64) {
+	c.lowerBoundX = lowerX
+	c.upperBoundX = upperX
+	c.lowerBoundY = lowerY
+	c.upperBoundY = upperY
+}
+
 //SetDimensions sets the width and height of the camera
 func (c *Camera) SetDimensions(width, height float64) {
 	c.Height = height
@@ -53,8 +64,28 @@ func (c *Camera) SetZoom(zoom float64) {
 	c.Zoom = zoom
 }
 
-func (c *Camera) SetZoomGradual(zoom float64){
-	
+func (c *Camera) SetZoomGradual(zoom float64) {
+
+}
+
+//GetOffsetX returns the camera X offset position
+func (c Camera) GetOffsetX() float64 {
+	return c.offSetX
+}
+
+//GetOffsetY returns the camera Y offset position
+func (c Camera) GetOffsetY() float64 {
+	return c.offSetY
+}
+
+//SetOffsetX sets the offset X
+func (c *Camera) SetOffsetX(offset float64) {
+	c.offSetX = offset
+}
+
+//SetOffsetY sets the offset Y
+func (c *Camera) SetOffsetY(offset float64) {
+	c.offSetY = offset
 }
 
 //GetX returns the camera X position
@@ -290,7 +321,7 @@ func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64
 		return
 	}
 	x, y := player.GetPosition()
-	x, y = x*c.Zoom, y*c.Zoom
+	x, y = (x+c.offSetX)*c.Zoom, (y+c.offSetY)*c.Zoom
 
 	// X-Axis
 	if !cameraOverWidth {
@@ -320,13 +351,13 @@ func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64
 	}
 }
 
-//FollowPlayer follows the specified character (in this case the player)
-func (c *Camera) FollowObject(player GameObject, worldWidth, worldHeight float64) {
+//FollowObjectInBounds follows the given GameObject within the bounds of the camera
+func (c *Camera) FollowObjectInBounds(player GameObject) {
 
-	//c.ChangeZoom()
-
-	worldHeight *= c.Zoom
-	worldWidth *= c.Zoom
+	worldHeight := c.upperBoundY * c.Zoom
+	worldWidth := c.upperBoundX * c.Zoom
+	lowerHeight := c.lowerBoundY * c.Zoom
+	lowerWidth := c.lowerBoundX * c.Zoom
 	cameraOverWidth, cameraOverHeight := false, false
 	if worldWidth < c.ScreenWidth {
 		//c.x = 0
@@ -345,33 +376,30 @@ func (c *Camera) FollowObject(player GameObject, worldWidth, worldHeight float64
 		return
 	}
 	x, y := player.GetPosition()
-	x, y = x*c.Zoom, y*c.Zoom
+	x, y = (x+c.offSetX)*c.Zoom, (y+c.offSetY)*c.Zoom
 
 	// X-Axis
 	if !cameraOverWidth {
 		// Follow Player Freely
-		if x-c.Width/2 > 0 && x+c.Width/2 < worldWidth {
+		if x-c.Width/2 > lowerWidth && x+c.Width/2 < worldWidth {
 			c.x = (x - c.Width/2)
 		} else if x+c.Width/2 >= worldWidth { // Stop at right edge
 			c.x = worldWidth - c.Width
 		} else { // Stop at left edge
-			c.x = 0
+			c.x = lowerWidth
 		}
 	}
 
 	// Y-Axis
 	if !cameraOverHeight {
 		// Follow Player Freely
-		if y-c.Height/2 > 0 && y+c.Height/2 < worldHeight {
+		if y-c.Height/2 > lowerHeight && y+c.Height/2 < worldHeight {
 			c.y = y - c.Height/2
 		} else if y+c.Height/2 >= worldHeight { // Stop at bottom
 			c.y = worldHeight - c.Height
 		} else { // Stop at top
-			c.y = 0
+			c.y = lowerHeight
 		}
-	}
-	if c.isShaking {
-		c.Shake()
 	}
 }
 
@@ -386,6 +414,7 @@ func (c *Camera) StartShaking(severe bool) {
 
 }
 
+//SetShakeRadius for the camera shake
 func (c *Camera) SetShakeRadius(radius float64) {
 	c.shakeRadius = radius
 }
