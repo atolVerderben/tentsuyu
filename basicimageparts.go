@@ -24,6 +24,15 @@ func NewBasicImageParts(sx, sy, width, height int) *BasicImageParts {
 	return b
 }
 
+//ReturnSourceRect returns the image.Rectangle for the subImage in ebtien
+//This replaces the overall ImageParts struct
+func (b *BasicImageParts) ReturnSourceRect() image.Rectangle {
+	if b.Reverse {
+		return image.Rect((b.Sx + b.Width), (b.Sy), (b.Sx), (b.Sy + b.Height))
+	}
+	return image.Rect((b.Sx), (b.Sy), (b.Sx + b.Width), (b.Sy + b.Height))
+}
+
 //SetDestinationDimensions can be used to set the size the image should be drawn to the screen
 func (b *BasicImageParts) SetDestinationDimensions(width, height int) {
 	b.DestWidth = width

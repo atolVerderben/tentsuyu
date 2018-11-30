@@ -10,8 +10,6 @@ import (
 	"github.com/hajimehoshi/ebiten/audio/wav"
 )
 
-const sampleRate = 22050
-
 var (
 	audioContext   *audio.Context
 	soundFilenames = []string{

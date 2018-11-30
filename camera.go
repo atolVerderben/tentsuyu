@@ -363,12 +363,12 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 		//c.x = 0
 		//c.y = 0
 		//c.Center(worldWidth/2, worldHeight/2)
-		c.CenterX(worldWidth / 2)
+		c.CenterX((worldWidth + lowerWidth) / 2)
 		cameraOverWidth = true
 
 	}
 	if worldHeight < c.ScreenHeight {
-		c.CenterY(worldHeight / 2)
+		c.CenterY((worldHeight + lowerHeight) / 2)
 		cameraOverHeight = true
 
 	}

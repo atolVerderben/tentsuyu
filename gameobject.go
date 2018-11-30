@@ -286,3 +286,9 @@ func (obj *BasicObject) Update() {
 func (obj *BasicObject) Draw(screen *ebiten.Image) error {
 	return nil
 }
+
+//ReturnVectorPosition returns the X,Y position as a vector2d
+//This is useful for vector math
+func (obj BasicObject) ReturnVectorPosition() Vector2d {
+	return Vector2d{X: obj.X, Y: obj.Y}
+}
