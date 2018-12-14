@@ -9,6 +9,7 @@ type Animation struct {
 	Frames                            []int
 	LoopCompleted                     bool
 	reverse                           bool
+	Repeating                         bool
 }
 
 //NewAnimation takes a spritesheet, []int of frames to play, and speed to return an Animation
@@ -24,6 +25,7 @@ func NewAnimation(spriteSheet *SpriteSheet, frames []int, speed int) *Animation 
 		},
 		frameSpeed: speed,
 		paused:     false,
+		Repeating:  true,
 	}
 
 	return a
@@ -81,6 +83,12 @@ func (a *Animation) Update() {
 			}
 		}
 	}
+
+	if !a.Repeating && !a.paused {
+		if a.LoopCompleted {
+			a.Stop()
+		}
+	}
 }
 
 //ReturnImageParts of the current animation
@@ -117,4 +125,22 @@ func (a *Animation) Pause() {
 //Resume playing the animation
 func (a *Animation) Resume() {
 	a.paused = false
+}
+
+//Play the animation
+func (a *Animation) Play() {
+	a.paused = false
+}
+
+//IsPaused returns true if the animation is paused
+func (a Animation) IsPaused() bool {
+	return a.paused
+}
+
+//Stop the animation
+func (a *Animation) Stop() {
+	a.paused = true
+	a.LoopCompleted = false
+	a.frameCount = 0
+	a.currFrame = 0
 }
