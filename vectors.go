@@ -74,11 +74,17 @@ func (v Vector2d) Length() float64 {
 
 //Normalize the vector by making it equal to magnitude of 1
 func (v *Vector2d) Normalize() {
+	if v.Length() == 0 {
+		return
+	}
 	v.Mul(1 / v.Length())
 }
 
 //Normalized returns a new normalized Vector2d
 func (v Vector2d) Normalized() *Vector2d {
+	if v.Length() == 0 {
+		return &Vector2d{}
+	}
 	return VectorMul(v, 1/v.Length())
 }
 

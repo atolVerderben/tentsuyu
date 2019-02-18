@@ -7,21 +7,13 @@ import (
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/audio"
+	"github.com/hajimehoshi/ebiten/audio/mp3"
 	"github.com/hajimehoshi/ebiten/audio/wav"
 )
 
 var (
-	audioContext   *audio.Context
-	soundFilenames = []string{
-		"kaboom-ah2.wav",
-		"spaloosh.wav",
-	}
-	soundPlayers = map[string]*audio.Player{}
+	audioContext *audio.Context
 )
-
-func init() {
-
-}
 
 func (p *AudioPlayer) PlaySE(se string) error {
 
@@ -118,8 +110,38 @@ func (p *AudioPlayer) AddSongFromFile(name, filelocation string) error {
 	return nil
 }
 
+func (p *AudioPlayer) AddSongFromFileMP3(name, filelocation string) error {
+	b, err := ioutil.ReadFile(filelocation)
+	if err != nil {
+		return err
+	}
+	s, err := mp3.Decode(audioContext, audio.BytesReadSeekCloser(b))
+	if err != nil {
+		return err
+	}
+	a, err := audio.NewPlayer(audioContext, s)
+	if err != nil {
+		return err
+	}
+	p.songs[name] = a
+	return nil
+}
+
 func (p *AudioPlayer) AddSongFromBytes(name string, b []byte) error {
 	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(b))
+	if err != nil {
+		return err
+	}
+	a, err := audio.NewPlayer(audioContext, s)
+	if err != nil {
+		return err
+	}
+	p.songs[name] = a
+	return nil
+}
+
+func (p *AudioPlayer) AddSongFromBytesMP3(name string, b []byte) error {
+	s, err := mp3.Decode(audioContext, audio.BytesReadSeekCloser(b))
 	if err != nil {
 		return err
 	}

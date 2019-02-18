@@ -2,6 +2,8 @@ package tentsuyu
 
 import (
 	"image"
+
+	"github.com/hajimehoshi/ebiten"
 )
 
 //BasicImageParts is easy to set up basic sprite image
@@ -65,4 +67,24 @@ func (b *BasicImageParts) Src(i int) (x0, y0, x1, y1 int) {
 		return x + b.Width, y, x, y + b.Height
 	}
 	return x, y, x + b.Width, y + b.Height
+}
+
+//SubImage returns the sub image of the passed ebiten.Image based on the BasicImageParts properties
+//Reduces the amount of coding needed in the actual game to get to drawing the image
+func (b BasicImageParts) SubImage(img *ebiten.Image) *ebiten.Image {
+	if b.Reverse {
+		return img.SubImage(image.Rect(b.Sx+b.Width, b.Sy, b.Sx, b.Sy+b.Height)).(*ebiten.Image)
+	}
+	return img.SubImage(image.Rect(b.Sx, b.Sy, b.Sx+b.Width, b.Sy+b.Height)).(*ebiten.Image)
+}
+
+//SetScale sets the scale of the DrawImageOptions based on the given DestHeight and DestWidth of the BasicImageParts
+func (b *BasicImageParts) SetScale(op *ebiten.DrawImageOptions) {
+	if b.DestWidth == 0 {
+		b.DestWidth = b.Width
+	}
+	if b.DestHeight == 0 {
+		b.DestHeight = b.Height
+	}
+	op.GeoM.Scale(float64(b.DestWidth/b.Width), float64(b.DestHeight/b.Height))
 }
