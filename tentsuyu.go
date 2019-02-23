@@ -9,8 +9,8 @@ var Components *Component
 
 //Input is the InputController for the entire game
 var (
-	Input        *InputController
-	ImageManager *imageManager
+	Input *InputController
+	//ImageManager *ImageManager
 )
 
 //BootUp initializes the package
@@ -23,9 +23,9 @@ func BootUp(screenWidth, screenHeight float64) {
 		ScreenWidth:     screenWidth,
 	}
 	Input = Components.InputController
-	ImageManager = &imageManager{
+	/*ImageManager = &ImageManager{
 		Images: map[string]*ebiten.Image{},
-	}
+	}*/
 }
 
 //Component holds different game elements and controllers

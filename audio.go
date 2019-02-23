@@ -30,13 +30,13 @@ func (p *AudioPlayer) ReturnSongPlayer(name string) *audio.Player {
 }
 
 func NewAudioPlayer() (*AudioPlayer, error) {
-	const sampleRate = 44100
+	sampleRate := 44100
 	var err error
 	audioContext, err = audio.NewContext(sampleRate)
 	if err != nil {
 		panic(err)
 	}
-	const bytesPerSample = 4
+	//const bytesPerSample = 4
 
 	player := &AudioPlayer{
 		audioContext: audioContext,

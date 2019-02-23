@@ -12,11 +12,11 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-type imageManager struct {
+type ImageManager struct {
 	Images map[string]*ebiten.Image
 }
 
-func (im *imageManager) LoadImageFromFile(name string, path string) error {
+func (im *ImageManager) LoadImageFromFile(name string, path string) error {
 
 	fImg1, _ := os.Open(path)
 	defer fImg1.Close()
@@ -35,18 +35,18 @@ func (im *imageManager) LoadImageFromFile(name string, path string) error {
 }
 
 //AddImage adds an ebiten.Image to the map with a given name
-func (im *imageManager) AddImage(name string, image *ebiten.Image) {
+func (im *ImageManager) AddImage(name string, image *ebiten.Image) {
 	im.Images[name] = image
 }
 
 //ReturnImage retrieves the specified image name
-func (im *imageManager) ReturnImage(name string) *ebiten.Image {
+func (im *ImageManager) ReturnImage(name string) *ebiten.Image {
 	return im.Images[name]
 }
 
 //AddImageFromBytes adds in the image based on a byte slice
 //Very helpful with using file2byteslice by HajimeHoshi
-func (im *imageManager) AddImageFromBytes(name string, b []byte) error {
+func (im *ImageManager) AddImageFromBytes(name string, b []byte) error {
 	img, _, err := image.Decode(bytes.NewReader(b))
 	if err != nil {
 		return err
