@@ -125,7 +125,7 @@ func ReadMapfromString(jString string) *Map {
 }
 
 //CreateTileMap creates a renderable TileMap
-func CreateTileMap(tilemap *Map) *TileMap {
+func CreateTileMap(tilemap *Map, imageManager *ImageManager) *TileMap {
 	tm := &TileMap{
 		Layers:     []*TileLayer{},
 		Width:      tilemap.Width,
@@ -133,7 +133,7 @@ func CreateTileMap(tilemap *Map) *TileMap {
 		TileHeight: tilemap.TileHeight,
 		TileWidth:  tilemap.TileWidth,
 	}
-	PrepareTileSet(tilemap)
+	PrepareTileSet(tilemap, imageManager)
 	for _, layer := range tilemap.Layers {
 		if layer.Type == "imagelayer" {
 			tl := &TileLayer{
@@ -241,7 +241,7 @@ func (t *Tile) Draw(screen *ebiten.Image) error {
 }
 
 //Draw the entire TileLayer
-func (tl *TileLayer) Draw(screen *ebiten.Image) error {
+func (tl *TileLayer) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	if tl.IsImageLayer {
 		op := &ebiten.DrawImageOptions{}
 		op.ImageParts = &BasicImageParts{
@@ -255,7 +255,7 @@ func (tl *TileLayer) Draw(screen *ebiten.Image) error {
 		//log.Printf("%v,%v\n", scalex, scaley)
 		ApplyCameraTransform(op, true)
 
-		screen.DrawImage(ImageManager.ReturnImage(tl.ImageName), op)
+		screen.DrawImage(imageManager.ReturnImage(tl.ImageName), op)
 
 		return nil
 	}
@@ -267,17 +267,17 @@ func (tl *TileLayer) Draw(screen *ebiten.Image) error {
 }
 
 //Draw the entire TileMap
-func (tm *TileMap) Draw(screen *ebiten.Image) error {
+func (tm *TileMap) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	for x := 0; x < len(tm.Layers); x++ {
-		tm.Layers[x].Draw(screen)
+		tm.Layers[x].Draw(screen, imageManager)
 	}
 	return nil
 }
 
 //PrepareTileSet imports the tileset image, and sets LastGID and Rows for easier calculation
-func PrepareTileSet(tilemap *Map) {
+func PrepareTileSet(tilemap *Map, imageManager *ImageManager) {
 	for x, tileSet := range tilemap.TileSets {
-		image := ImageManager.ReturnImage(tilemap.TileSets[x].Name) //ebitenutil.NewImageFromFile(tilemap.TileSets[x].ImageName, ebiten.FilterNearest)
+		image := imageManager.ReturnImage(tilemap.TileSets[x].Name) //ebitenutil.NewImageFromFile(tilemap.TileSets[x].ImageName, ebiten.FilterNearest)
 
 		tilemap.TileSets[x].Image = image
 		tilemap.TileSets[x].LastGID = tileSet.FirstGID + tileSet.TileCount
