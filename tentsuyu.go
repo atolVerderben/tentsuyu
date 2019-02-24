@@ -46,12 +46,6 @@ func CenterCursor(center bool) {
 	Components.UIController.Cursor.NotCentered = !center
 }
 
-//OnScreen returns true if the specified coords are currently on the screenWidth
-//i.e. the position is within the camera's view
-func OnScreen(x, y float64, width, height int) bool {
-	return Components.Camera.OnScreen(x, y, width, height)
-}
-
 //Collision returns true if two given BasicObjects are overlapping
 func Collision(obj1 *BasicObject, obj2 *BasicObject) bool {
 	//Objects are to the left of each other

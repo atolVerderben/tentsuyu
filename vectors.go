@@ -54,10 +54,12 @@ func (v Vector2d) Dot(other Vector2d) float64 {
 	return v.X*other.X + v.Y*other.Y
 }
 
+//Cross Product of two 2D Vectors
 func (v Vector2d) Cross(other Vector2d) float64 {
 	return v.X*other.Y - v.Y*other.X
 }
 
+//Crossf is cross of Vector and float64
 func (v Vector2d) Crossf(other float64) Vector2d {
 	return Vector2d{-v.Y * other, v.X * other}
 }

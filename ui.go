@@ -237,7 +237,7 @@ func NewUINumberDisplay(number *float64, x, y float64, w, h int, font *truetype.
 	return nd
 }
 
-//UINumberDisplay allows a pointer to a float64 that updates and draws a TextElement on update
+//UINumberDisplayInt allows a pointer to an integer that updates and draws a TextElement on update
 type UINumberDisplayInt struct {
 	*TextElement
 	currNumber *int
@@ -254,7 +254,7 @@ func (nd *UINumberDisplayInt) Update() {
 	nd.TextElement.Update()
 }
 
-//NewUINumberDisplay creates a new UINumberDisplay
+//NewUINumberDisplayInt creates a new UINumberDisplayInt
 func NewUINumberDisplayInt(number *int, x, y float64, w, h int, font *truetype.Font, fntSize float64, textColor color.Color) *UINumberDisplayInt {
 	nd := &UINumberDisplayInt{
 		currNumber:  number,

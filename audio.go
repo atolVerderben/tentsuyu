@@ -15,6 +15,7 @@ var (
 	audioContext *audio.Context
 )
 
+//PlaySE playes the sound effect with the given name
 func (p *AudioPlayer) PlaySE(se string) error {
 
 	sePlayer, _ := audio.NewPlayerFromBytes(p.audioContext, p.seBytes[se])
@@ -57,6 +58,8 @@ func NewAudioPlayer() (*AudioPlayer, error) {
 	return player, nil
 }
 
+//AddSoundEffectFromFile adds a SE of the given name and volume at the file location.
+//This format takes a WAV
 func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string, volume float64) error {
 	fb, err := ioutil.ReadFile(filelocation)
 	if err != nil {

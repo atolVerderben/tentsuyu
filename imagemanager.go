@@ -12,16 +12,19 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+//NewImageManager creates a new pointer to ImageManager
 func NewImageManager() *ImageManager {
 	return &ImageManager{
 		Images: map[string]*ebiten.Image{},
 	}
 }
 
+//ImageManager is a struct containing a map of named ebiten.Images
 type ImageManager struct {
 	Images map[string]*ebiten.Image
 }
 
+//LoadImageFromFile loads the given image at "path" with "name"
 func (im *ImageManager) LoadImageFromFile(name string, path string) error {
 
 	fImg1, _ := os.Open(path)
