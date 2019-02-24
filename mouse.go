@@ -102,9 +102,9 @@ func (m *Mouse) update(input *InputController) {
 }
 
 //GetGameMouseCoordsNoZoom is the same as GetGameMouseCoords but ignores the camera's zoom level (useful for drawing the cursor)
-func (m *Mouse) GetGameMouseCoordsNoZoom() (x, y float64) {
+func (m *Mouse) GetGameMouseCoordsNoZoom(camera *Camera) (x, y float64) {
 	mx, my := ebiten.CursorPosition()
-	x, y = (float64(mx) + (Components.Camera.GetX())), (float64(my) + (Components.Camera.GetY()))
+	x, y = (float64(mx) + (camera.GetX())), (float64(my) + (camera.GetY()))
 	return x, y
 }
 

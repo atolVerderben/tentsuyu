@@ -25,28 +25,28 @@ const (
 )
 
 //LoadDefaultFonts adds the Go supplied fonts to the tentsuyu UIController
-func LoadDefaultFonts() {
+func LoadDefaultFonts(uiController *UIController) {
 	font, _ := truetype.Parse(goregular.TTF)
-	Components.UIController.AddFontFile(FntRegular, font)
+	uiController.AddFontFile(FntRegular, font)
 
 	font1, _ := truetype.Parse(gomono.TTF)
-	Components.UIController.AddFontFile(FntMono, font1)
+	uiController.AddFontFile(FntMono, font1)
 
 	font2, _ := truetype.Parse(gobold.TTF)
-	Components.UIController.AddFontFile(FntBold, font2)
+	uiController.AddFontFile(FntBold, font2)
 
 	font3, _ := truetype.Parse(goitalic.TTF)
-	Components.UIController.AddFontFile(FntItalic, font3)
+	uiController.AddFontFile(FntItalic, font3)
 
 	font4, _ := truetype.Parse(gobolditalic.TTF)
-	Components.UIController.AddFontFile(FntBoldItalic, font4)
+	uiController.AddFontFile(FntBoldItalic, font4)
 
 	font5, _ := truetype.Parse(gomonobold.TTF)
-	Components.UIController.AddFontFile(FntMonoBold, font5)
+	uiController.AddFontFile(FntMonoBold, font5)
 
 	font6, _ := truetype.Parse(gomonoitalic.TTF)
-	Components.UIController.AddFontFile(FntMonoItalic, font6)
+	uiController.AddFontFile(FntMonoItalic, font6)
 
 	font7, _ := truetype.Parse(gomonobolditalic.TTF)
-	Components.UIController.AddFontFile(FntMonoBoldItalic, font7)
+	uiController.AddFontFile(FntMonoBoldItalic, font7)
 }

@@ -16,10 +16,10 @@ type Menu struct {
 }
 
 //NewMenu creates a new menu
-func NewMenu() *Menu {
+func NewMenu(screenWidth, screenHeight float64) *Menu {
 	m := &Menu{
-		midStartX:   Components.ScreenWidth / 2,
-		midStartY:   Components.ScreenHeight / 4,
+		midStartX:   screenWidth / 2,
+		midStartY:   screenHeight / 4,
 		paddingX:    10,
 		paddingY:    20,
 		selectedRow: -1,

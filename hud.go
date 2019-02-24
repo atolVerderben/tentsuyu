@@ -17,10 +17,10 @@ type hudElement struct {
 }
 
 //NewHUD returns a new HUD object
-func NewHUD() *HUD {
+func NewHUD(screenWidth, screenHeight float64) *HUD {
 	hud := &HUD{
-		w:          Components.ScreenWidth,
-		h:          Components.ScreenHeight,
+		w:          screenWidth,
+		h:          screenHeight,
 		uiElements: make(map[string]*hudElement),
 	}
 	hud.createSections()
@@ -29,8 +29,8 @@ func NewHUD() *HUD {
 
 //Update updates the HUD....prevHealth
 func (hud *HUD) Update() {
-	hud.x = Components.Camera.GetX()
-	hud.y = Components.Camera.GetY()
+	//hud.x = Components.Camera.GetX()
+	//hud.y = Components.Camera.GetY()
 	//if hud.x != hud.prevX || hud.y != hud.prevY {
 	for _, element := range hud.topLeft.elements {
 		element.UIElement.SetPosition(hud.x+element.hudX, hud.y+element.hudY)
@@ -172,20 +172,20 @@ func (hud *HUD) createSections() {
 		elements: []*hudElement{},
 	}
 	hud.topRight = &hudSection{
-		startX:   Components.ScreenWidth - 10,
+		startX:   hud.w - 10,
 		startY:   5,
 		elements: []*hudElement{},
 	}
 	hud.bottomLeft = &hudSection{
 		elements: []*hudElement{},
 		startX:   10,
-		startY:   Components.ScreenHeight - 10,
+		startY:   hud.h - 10,
 		invertY:  true,
 	}
 	hud.bottomRight = &hudSection{
 		elements: []*hudElement{},
-		startX:   Components.ScreenWidth - 10,
-		startY:   Components.ScreenHeight - 10,
+		startX:   hud.w - 10,
+		startY:   hud.h - 10,
 		invertY:  true,
 	}
 }

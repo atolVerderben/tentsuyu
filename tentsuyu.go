@@ -4,46 +4,14 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
-//Components stores all the different components used together in the engine
-var Components *Component
-
-//Input is the InputController for the entire game
-var (
-//Input *InputController
-//ImageManager *ImageManager
-)
-
-//BootUp initializes the package
-func BootUp(screenWidth, screenHeight float64) {
-	Components = &Component{
-		Camera:          CreateCamera(screenWidth, screenHeight),
-		InputController: NewInputController(),
-		//UIController:    NewUIController(),
-		ScreenHeight: screenHeight,
-		ScreenWidth:  screenWidth,
-	}
-	//Input = Components.InputController
-	/*ImageManager = &ImageManager{
-		Images: map[string]*ebiten.Image{},
-	}*/
-}
-
-//Component holds different game elements and controllers
-type Component struct {
-	*Camera
-	*InputController
-	*UIController
-	ScreenWidth, ScreenHeight float64
-}
-
 //SetCustomCursor to allow for drawing your own cursor object
-func SetCustomCursor(width, height, sx, sy int, spritesheet *ebiten.Image) {
-	Components.UIController.SetCustomCursor(width, height, sx, sy, spritesheet)
+func SetCustomCursor(uiController *UIController, width, height, sx, sy int, spritesheet *ebiten.Image) {
+	uiController.SetCustomCursor(width, height, sx, sy, spritesheet)
 }
 
 //CenterCursor sets whether the cursor is centered or not
-func CenterCursor(center bool) {
-	Components.UIController.Cursor.NotCentered = !center
+func CenterCursor(uiController *UIController, center bool) {
+	uiController.Cursor.NotCentered = !center
 }
 
 //Collision returns true if two given BasicObjects are overlapping
