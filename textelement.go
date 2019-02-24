@@ -180,7 +180,7 @@ func (t *TextElement) Draw(screen *ebiten.Image) error {
 	op.GeoM.Translate(t.GetPosition())
 	//GameCamera.DrawCameraTransform(op)
 	if !t.Stationary {
-		ApplyCameraTransform(op, false)
+		//ApplyCameraTransform(op, false)
 	}
 	if err := screen.DrawImage(t.drawImage, op); err != nil {
 		return err
@@ -197,7 +197,7 @@ func (t *TextElement) DrawApplyZoom(screen *ebiten.Image) error {
 	op.GeoM.Translate(t.GetPosition())
 	//GameCamera.DrawCameraTransform(op)
 	if !t.Stationary {
-		ApplyCameraTransform(op, true)
+		//ApplyCameraTransform(op, true)
 	}
 	if err := screen.DrawImage(t.drawImage, op); err != nil {
 		return err

@@ -12,6 +12,12 @@ import (
 	"github.com/hajimehoshi/ebiten"
 )
 
+func NewImageManager() *ImageManager {
+	return &ImageManager{
+		Images: map[string]*ebiten.Image{},
+	}
+}
+
 type ImageManager struct {
 	Images map[string]*ebiten.Image
 }

@@ -32,6 +32,7 @@ type UIController struct {
 	fonts                     map[string]*truetype.Font
 	textElements              map[string]*TextElement
 	menus                     map[string]*Menu
+	input                     *InputController
 }
 
 //AddFont adds a new truetype font to the map
@@ -125,12 +126,13 @@ func (ui *UIController) ReturnFont(name string) *truetype.Font {
 }
 
 //NewUIController creates a default UI controller
-func NewUIController() *UIController {
+func NewUIController(input *InputController) *UIController {
 	ui := &UIController{
 		DrawCursor:   true,
 		fonts:        make(map[string]*truetype.Font),
 		textElements: make(map[string]*TextElement),
 		menus:        make(map[string]*Menu),
+		input:        input,
 	}
 	return ui
 }
@@ -196,11 +198,11 @@ func (ui *UIController) Update() {
 	}
 	for i := range ui.menus {
 		if ui.menus[i].Active {
-			ui.menus[i].Update()
+			ui.menus[i].Update(ui.input)
 		}
 	}
 	if ui.customCursor == true {
-		ui.Cursor.Update(Input.GetMouseCoords()) //Input.Mouse.X, Input.Mouse.Y)
+		ui.Cursor.Update(ui.input.GetMouseCoords()) //Input.Mouse.X, Input.Mouse.Y)
 	}
 }
 

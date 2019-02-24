@@ -9,8 +9,8 @@ var Components *Component
 
 //Input is the InputController for the entire game
 var (
-	Input *InputController
-	//ImageManager *ImageManager
+//Input *InputController
+//ImageManager *ImageManager
 )
 
 //BootUp initializes the package
@@ -18,11 +18,11 @@ func BootUp(screenWidth, screenHeight float64) {
 	Components = &Component{
 		Camera:          CreateCamera(screenWidth, screenHeight),
 		InputController: NewInputController(),
-		UIController:    NewUIController(),
-		ScreenHeight:    screenHeight,
-		ScreenWidth:     screenWidth,
+		//UIController:    NewUIController(),
+		ScreenHeight: screenHeight,
+		ScreenWidth:  screenWidth,
 	}
-	Input = Components.InputController
+	//Input = Components.InputController
 	/*ImageManager = &ImageManager{
 		Images: map[string]*ebiten.Image{},
 	}*/
@@ -34,15 +34,6 @@ type Component struct {
 	*InputController
 	*UIController
 	ScreenWidth, ScreenHeight float64
-}
-
-//ApplyCameraTransform applies the camera's position to the DrawImageOptions, bool toggles whether zoom is applied or not
-func ApplyCameraTransform(op *ebiten.DrawImageOptions, applyZoom bool) {
-	if applyZoom {
-		Components.Camera.DrawCameraTransform(op)
-	} else {
-		Components.Camera.DrawCameraTransformIgnoreZoom(op)
-	}
 }
 
 //SetCustomCursor to allow for drawing your own cursor object

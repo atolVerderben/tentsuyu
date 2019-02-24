@@ -268,6 +268,15 @@ func (c *Camera) DrawCameraTransformIgnoreZoom(op *ebiten.DrawImageOptions) {
 	op.GeoM.Translate(-c.x, -c.y)
 }
 
+//ApplyCameraTransform applies the camera's position to the DrawImageOptions, bool toggles whether zoom is applied or not
+func (c Camera) ApplyCameraTransform(op *ebiten.DrawImageOptions, applyZoom bool) {
+	if applyZoom {
+		c.DrawCameraTransform(op)
+	} else {
+		c.DrawCameraTransformIgnoreZoom(op)
+	}
+}
+
 //Update the camera
 func (c *Camera) Update() {
 	if c.startShaking {

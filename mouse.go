@@ -62,8 +62,8 @@ func (m *Mouse) IsScrollUp() bool {
 	return false
 }
 
-func (m *Mouse) update() {
-	m.X, m.Y = Input.GetMouseCoords() //m.GetGameMouseCoordsNoZoom()
+func (m *Mouse) update(input *InputController) {
+	m.X, m.Y = input.GetMouseCoords() //m.GetGameMouseCoordsNoZoom()
 	m.mouseWheelMoving = false
 	wX, wY := ebiten.Wheel()
 	if wX != 0 || wY != 0 {

@@ -32,9 +32,11 @@ func (p *AudioPlayer) ReturnSongPlayer(name string) *audio.Player {
 func NewAudioPlayer() (*AudioPlayer, error) {
 	sampleRate := 44100
 	var err error
-	audioContext, err = audio.NewContext(sampleRate)
-	if err != nil {
-		panic(err)
+	if audioContext == nil {
+		audioContext, err = audio.NewContext(sampleRate)
+		if err != nil {
+			panic(err)
+		}
 	}
 	//const bytesPerSample = 4
 

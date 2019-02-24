@@ -67,7 +67,7 @@ func (m *Menu) PressSelected() {
 }
 
 //Update the menu
-func (m *Menu) Update() {
+func (m *Menu) Update(input *InputController) {
 	//log.Printf("%v,%v\n", m.maxWidth, m.maxHeight)
 	//m.x = Components.Camera.GetX()
 	//m.y = Components.Camera.GetY()
@@ -89,7 +89,7 @@ func (m *Menu) Update() {
 			}
 
 			//m.elements[x][y].UIElement.SetPosition(mx, my)
-			if m.Elements[x][y].Update() {
+			if m.Elements[x][y].Update(input) {
 				m.selectedCol = -1
 				m.selectedRow = -1
 			}
@@ -212,14 +212,14 @@ func (m *MenuElement) SetAction(function func()) {
 }
 
 //Update the MenuElement
-func (m *MenuElement) Update() bool {
+func (m *MenuElement) Update(input *InputController) bool {
 	mouseHighlight := false
-	if m.UIElement.Contains(Input.Mouse.X, Input.Mouse.Y) {
+	if m.UIElement.Contains(input.Mouse.X, input.Mouse.Y) {
 		if m.Selectable {
 			mouseHighlight = true
 			m.Highlighted()
 			m.highlighted = true
-			if Input.LeftClick().JustPressed() {
+			if input.LeftClick().JustPressed() {
 
 				if m.Action != nil {
 					m.Action()

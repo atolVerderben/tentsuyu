@@ -26,19 +26,19 @@ func NewTextBox(x, y float64, w, h int, font *truetype.Font, text []string, text
 }
 
 //Update the TextBox checkts whether it is selecter and what keystrokes have happened
-func (tb *TextBox) Update() {
+func (tb *TextBox) Update(input *InputController) {
 
 	tb.Text.Update()
 
-	if tb.Text.Contains(Input.Mouse.X, Input.Mouse.Y) {
-		if Input.LeftClick().JustPressed() {
+	if tb.Text.Contains(input.Mouse.X, input.Mouse.Y) {
+		if input.LeftClick().JustPressed() {
 			if !tb.Selected {
 				tb.Text.Highlighted()
 				tb.Selected = true
 			}
 		}
 	} else {
-		if Input.LeftClick().JustPressed() {
+		if input.LeftClick().JustPressed() {
 			tb.Text.UnHighlighted()
 			tb.Selected = false
 		}
@@ -46,11 +46,11 @@ func (tb *TextBox) Update() {
 	if tb.Selected {
 		tb.Text.text[0] += string(ebiten.InputChars())
 		tb.Text.SetText(tb.Text.text)
-		if Input.keyManager.Get(ebiten.KeyEnter).JustPressed() || Input.keyManager.Get(ebiten.KeyKPEnter).JustPressed() {
+		if input.keyManager.Get(ebiten.KeyEnter).JustPressed() || input.keyManager.Get(ebiten.KeyKPEnter).JustPressed() {
 			tb.Text.UnHighlighted()
 			tb.Selected = false
 		}
-		if Input.keyManager.Get(ebiten.KeyBackspace).JustPressed() {
+		if input.keyManager.Get(ebiten.KeyBackspace).JustPressed() {
 			if utf8.RuneCountInString(tb.Text.text[0]) > 0 {
 				tb.Text.text[0] = tb.Text.text[0][:len(tb.Text.text[0])-1]
 				tb.Text.SetText(tb.Text.text)

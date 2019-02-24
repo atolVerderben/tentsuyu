@@ -232,7 +232,7 @@ func (t *Tile) Draw(screen *ebiten.Image) error {
 	op.GeoM.Translate(t.X, t.Y)
 
 	//log.Printf("%v,%v\n", scalex, scaley)
-	ApplyCameraTransform(op, true)
+	//ApplyCameraTransform(op, true)
 	//if Components.Camera.OnScreen(t.X, t.Y) {
 	screen.DrawImage(t.Image, op)
 	//}
@@ -253,7 +253,7 @@ func (tl *TileLayer) Draw(screen *ebiten.Image, imageManager *ImageManager) erro
 		op.GeoM.Translate(tl.X, tl.Y)
 
 		//log.Printf("%v,%v\n", scalex, scaley)
-		ApplyCameraTransform(op, true)
+		//ApplyCameraTransform(op, true)
 
 		screen.DrawImage(imageManager.ReturnImage(tl.ImageName), op)
 

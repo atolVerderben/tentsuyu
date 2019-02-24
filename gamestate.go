@@ -12,8 +12,12 @@ type GameState interface {
 type GameStateMsg string
 
 const (
-	GameStateMsgNone   GameStateMsg = ""
-	GameStateMsgPaused              = "Paused"
+	//GameStateMsgNone is the default empty message
+	GameStateMsgNone GameStateMsg = ""
+	//GameStateMsgPause pauses the game
+	GameStateMsgPause = "Paused"
+	//GameStateMsgUnPause resumes the game from a paused state
+	GameStateMsgUnPause = "UnPaused"
 )
 
 func defaultGameState() GameState {

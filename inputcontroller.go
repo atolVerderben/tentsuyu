@@ -73,13 +73,13 @@ func (ic *InputController) GetGameMouseCoordsNoZoom() (x, y float64) {
 //Update InputController
 func (ic *InputController) Update() {
 	ic.keyManager.update()
-	ic.Mouse.update()
+	ic.Mouse.update(ic)
 
 }
 
 // RegisterButton registers a new button input.
 func (ic *InputController) RegisterButton(name string, triggerKeys ...ebiten.Key) {
-	ic.buttons[name] = NewButton(name, triggerKeys)
+	ic.buttons[name] = NewButton(name, triggerKeys, ic)
 	for i := range triggerKeys {
 		ic.keyManager.AddKey(triggerKeys[i])
 	}
@@ -90,6 +90,7 @@ func (ic *InputController) RegisterMouseButton(name string, buttons ...ebiten.Mo
 	ic.mouseButtons[name] = MouseButton{
 		Name:     name,
 		Triggers: buttons,
+		input:    ic,
 	}
 }
 

@@ -44,11 +44,9 @@ func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 		Random:        rand.New(rand.NewSource(time.Now().UnixNano())),
 		Input:         NewInputController(),
 		DefaultCamera: CreateCamera(screenWidth, screenHeight),
-		UIController:  NewUIController(),
-		ImageManager: &ImageManager{
-			Images: map[string]*ebiten.Image{},
-		},
+		ImageManager:  NewImageManager(),
 	}
+	game.UIController = NewUIController(game.Input)
 	game.AudioPlayer, err = NewAudioPlayer()
 	if err != nil {
 		return nil, err
@@ -92,6 +90,7 @@ func (g *Game) ToggleFullscreen() {
 
 //Loop is the main game loop
 func (g *Game) Loop(screen *ebiten.Image) error {
+
 	if g.imageLoadedCh != nil || g.audioLoadedCh != nil {
 		select {
 		case g.ImageManager = <-g.imageLoadedCh:
@@ -131,10 +130,10 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 		if err := g.gameState.Draw(g); err != nil {
 			return err
 		}
-		g.scoreDisplay.Update()
-		g.highScoreDisplay.Update()
-		g.scoreDisplay.Draw(g.Screen)
-		g.highScoreDisplay.Draw(g.Screen)
+		//g.scoreDisplay.Update()
+		//g.highScoreDisplay.Update()
+		//g.scoreDisplay.Draw(g.Screen)
+		//g.highScoreDisplay.Draw(g.Screen)
 		g.UIController.Draw(g.Screen)
 	}
 
@@ -145,6 +144,11 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 //SetGameState of the game
 func (g *Game) SetGameState(gs GameState) {
 	g.gameState = gs
+}
+
+//GetGameState of the game
+func (g Game) GetGameState() GameState {
+	return g.gameState
 }
 
 //SetPauseState of the game
@@ -171,13 +175,14 @@ func (g *Game) SetGameStateLoop(gFunction GameHelperFunction) {
 //This is used to load images before a gamestate is set
 func (g *Game) LoadImages(gFunction GameLoadImagesFunction) {
 	go func() {
-		imageManager := &ImageManager{
-			Images: map[string]*ebiten.Image{},
-		}
+		/*var imageManager *ImageManager
 		if imageManager = gFunction(); imageManager != nil {
 			g.imageLoadedCh <- imageManager
-		}
-		close(g.imageLoadedCh)
+			//close(g.imageLoadedCh)
+		}*/
+		imageManager := gFunction()
+		g.imageLoadedCh <- imageManager
+
 	}()
 
 }
@@ -186,10 +191,12 @@ func (g *Game) LoadImages(gFunction GameLoadImagesFunction) {
 //This is used to load audio before a gamestate is set
 func (g *Game) LoadAudio(gFunction GameLoadAudioFunction) {
 	go func() {
-		audioPlayer, _ := NewAudioPlayer()
+		/*var audioPlayer *AudioPlayer
 		if audioPlayer = gFunction(); audioPlayer != nil {
 			g.audioLoadedCh <- audioPlayer
-		}
-		close(g.audioLoadedCh)
+			//close(g.audioLoadedCh)
+		}*/
+		audioPlayer := gFunction()
+		g.audioLoadedCh <- audioPlayer
 	}()
 }

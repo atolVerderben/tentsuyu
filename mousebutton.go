@@ -6,12 +6,13 @@ import "github.com/hajimehoshi/ebiten"
 type MouseButton struct {
 	Name     string
 	Triggers []ebiten.MouseButton
+	input    *InputController
 }
 
 // JustPressed checks whether an input was pressed in the previous frame.
 func (b MouseButton) JustPressed() bool {
 	for _, trigger := range b.Triggers {
-		v := Input.Mouse.Get(trigger).JustPressed()
+		v := b.input.Mouse.Get(trigger).JustPressed()
 		if v {
 			return v
 		}
@@ -23,7 +24,7 @@ func (b MouseButton) JustPressed() bool {
 // JustReleased checks whether an input was released in the previous frame.
 func (b MouseButton) JustReleased() bool {
 	for _, trigger := range b.Triggers {
-		v := Input.Mouse.Get(trigger).JustReleased()
+		v := b.input.Mouse.Get(trigger).JustReleased()
 		if v {
 			return v
 		}
@@ -35,7 +36,7 @@ func (b MouseButton) JustReleased() bool {
 // Down checks whether the current input is being held down.
 func (b MouseButton) Down() bool {
 	for _, trigger := range b.Triggers {
-		v := Input.Mouse.Get(trigger).Down()
+		v := b.input.Mouse.Get(trigger).Down()
 		if v {
 			return v
 		}
