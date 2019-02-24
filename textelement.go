@@ -70,10 +70,12 @@ func NewTextElementStationary(x, y float64, w, h int, font *truetype.Font, text 
 	return t
 }
 
+//Hide the TextElement
 func (t *TextElement) Hide() {
 	t.visible = false
 }
 
+//Show the TextElement
 func (t *TextElement) Show() {
 	t.visible = true
 }
@@ -99,15 +101,14 @@ func (t *TextElement) SetFontSize(fntSize float64) {
 func (t *TextElement) drawText(text []string) error {
 	w, h := t.GetSize()
 	dst := image.NewRGBA(image.Rect(0, 0, w, h))
-	const size = 24
-	const dpi = 72
+
 	d := &font.Drawer{
 		Dst: dst,
 		Src: image.NewUniform(t.textColor), //image.White,
 		Face: truetype.NewFace(t.font, &truetype.Options{
-			Size:    t.fntSize,
-			DPI:     t.fntDpi,
-			Hinting: font.HintingFull,
+			Size: t.fntSize,
+			DPI:  t.fntDpi,
+			//Hinting: font.HintingFull,
 		}),
 	}
 	highlight := color.White
@@ -118,9 +119,9 @@ func (t *TextElement) drawText(text []string) error {
 		Dst: dst,
 		Src: image.NewUniform(highlight),
 		Face: truetype.NewFace(t.font, &truetype.Options{
-			Size:    t.fntSize,
-			DPI:     t.fntDpi,
-			Hinting: font.HintingFull,
+			Size: t.fntSize,
+			DPI:  t.fntDpi,
+			//Hinting: font.HintingFull,
 		}),
 	}
 	y := t.fntSize

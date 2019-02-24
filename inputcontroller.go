@@ -40,6 +40,16 @@ func (ic *InputController) RightClick() MouseState {
 	return ic.Mouse.buttonMap[ebiten.MouseButtonRight]
 }
 
+//MouseWheelUp returns true if the user is scrolling up
+func (ic *InputController) MouseWheelUp() bool {
+	return ic.Mouse.IsScrollUp()
+}
+
+//MouseWheelDown returns true if the user is scrolling down
+func (ic *InputController) MouseWheelDown() bool {
+	return ic.Mouse.IsScrollDown()
+}
+
 //GetMouseCoords returns the ebiten mouse coords
 func (ic *InputController) GetMouseCoords() (float64, float64) {
 	x, y := ebiten.CursorPosition()

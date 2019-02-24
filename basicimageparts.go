@@ -1,9 +1,16 @@
 package tentsuyu
 
+import (
+	"image"
+
+	"github.com/hajimehoshi/ebiten"
+)
+
 //BasicImageParts is easy to set up basic sprite image
 type BasicImageParts struct {
 	Width, Height, Sx, Sy, DestWidth, DestHeight int
 	Reverse                                      bool
+	SourceRect                                   *image.Rectangle
 }
 
 //NewBasicImageParts returns a pointer to new BasicImageParts
@@ -17,6 +24,15 @@ func NewBasicImageParts(sx, sy, width, height int) *BasicImageParts {
 		DestWidth:  width,
 	}
 	return b
+}
+
+//ReturnSourceRect returns the image.Rectangle for the subImage in ebtien
+//This replaces the overall ImageParts struct
+func (b *BasicImageParts) ReturnSourceRect() image.Rectangle {
+	if b.Reverse {
+		return image.Rect((b.Sx + b.Width), (b.Sy), (b.Sx), (b.Sy + b.Height))
+	}
+	return image.Rect((b.Sx), (b.Sy), (b.Sx + b.Width), (b.Sy + b.Height))
 }
 
 //SetDestinationDimensions can be used to set the size the image should be drawn to the screen
@@ -51,4 +67,24 @@ func (b *BasicImageParts) Src(i int) (x0, y0, x1, y1 int) {
 		return x + b.Width, y, x, y + b.Height
 	}
 	return x, y, x + b.Width, y + b.Height
+}
+
+//SubImage returns the sub image of the passed ebiten.Image based on the BasicImageParts properties
+//Reduces the amount of coding needed in the actual game to get to drawing the image
+func (b BasicImageParts) SubImage(img *ebiten.Image) *ebiten.Image {
+	if b.Reverse {
+		return img.SubImage(image.Rect(b.Sx+b.Width, b.Sy, b.Sx, b.Sy+b.Height)).(*ebiten.Image)
+	}
+	return img.SubImage(image.Rect(b.Sx, b.Sy, b.Sx+b.Width, b.Sy+b.Height)).(*ebiten.Image)
+}
+
+//SetScale sets the scale of the DrawImageOptions based on the given DestHeight and DestWidth of the BasicImageParts
+func (b *BasicImageParts) SetScale(op *ebiten.DrawImageOptions) {
+	if b.DestWidth == 0 {
+		b.DestWidth = b.Width
+	}
+	if b.DestHeight == 0 {
+		b.DestHeight = b.Height
+	}
+	op.GeoM.Scale(float64(b.DestWidth/b.Width), float64(b.DestHeight/b.Height))
 }

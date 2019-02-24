@@ -28,7 +28,7 @@ func RenderTextToImage(text []string, w, h int, fntSize float64, fnt *truetype.F
 		Face: truetype.NewFace(fnt, &truetype.Options{
 			Size:    fntSize,
 			DPI:     dpi,
-			Hinting: font.HintingFull,
+			Hinting: font.HintingNone,
 		}),
 	}
 	/*highlight := color.White

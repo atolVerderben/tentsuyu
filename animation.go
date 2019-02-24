@@ -7,6 +7,9 @@ type Animation struct {
 	ImageParts                        *BasicImageParts
 	SpriteSheet                       *SpriteSheet
 	Frames                            []int
+	LoopCompleted                     bool
+	reverse                           bool
+	Repeating                         bool
 }
 
 //NewAnimation takes a spritesheet, []int of frames to play, and speed to return an Animation
@@ -22,25 +25,68 @@ func NewAnimation(spriteSheet *SpriteSheet, frames []int, speed int) *Animation 
 		},
 		frameSpeed: speed,
 		paused:     false,
+		Repeating:  true,
 	}
 
 	return a
 }
 
+//SetReverse tells the animation to play in reverse
+func (a *Animation) SetReverse() {
+	a.reverse = true
+}
+
+//SetForward tells the animation to play normally.
+//This should only be necessary after calling SetReverse()
+func (a *Animation) SetForward() {
+	a.reverse = false
+}
+
 //Update the animation if not paused
 func (a *Animation) Update() {
 	if !a.paused {
-		a.frameCount++
-		if a.frameCount > a.frameSpeed {
-			a.currFrame++
-			if a.currFrame >= len(a.Frames) {
-				a.currFrame = 0
+		if !a.reverse {
+			a.frameCount++
+			if a.frameCount > a.frameSpeed {
+				a.currFrame++
+				if a.currFrame >= len(a.Frames) {
+					a.currFrame = 0
+					a.LoopCompleted = true
+				} else {
+					if a.LoopCompleted == true {
+						a.LoopCompleted = false
+					}
+				}
+				a.frameCount = 0
+				a.ImageParts.Sx = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["x"]
+				a.ImageParts.Sy = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["y"]
+				a.ImageParts.Width = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["w"]
+				a.ImageParts.Height = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["h"]
 			}
-			a.frameCount = 0
-			a.ImageParts.Sx = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["x"]
-			a.ImageParts.Sy = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["y"]
-			a.ImageParts.Width = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["w"]
-			a.ImageParts.Height = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["h"]
+		} else {
+			a.frameCount++
+			if a.frameCount > a.frameSpeed {
+				a.currFrame--
+				if a.currFrame <= 0 {
+					a.currFrame = len(a.Frames) - 1
+					a.LoopCompleted = true
+				} else {
+					if a.LoopCompleted == true {
+						a.LoopCompleted = false
+					}
+				}
+				a.frameCount = 0
+				a.ImageParts.Sx = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["x"]
+				a.ImageParts.Sy = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["y"]
+				a.ImageParts.Width = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["w"]
+				a.ImageParts.Height = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["h"]
+			}
+		}
+	}
+
+	if !a.Repeating && !a.paused {
+		if a.LoopCompleted {
+			a.Stop()
 		}
 	}
 }
@@ -55,10 +101,20 @@ func (a *Animation) SetAnimationSpeed(speed int) {
 	a.frameSpeed = speed
 }
 
+//CurrentFrame returns the current frame of the animation
+func (a Animation) CurrentFrame() int {
+	return a.currFrame
+}
+
 //SetCurrentFrame of the current animation
 func (a *Animation) SetCurrentFrame(frame int) {
 	a.currFrame = frame
 	a.frameCount = 0
+	a.ImageParts.Sx = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["x"]
+	a.ImageParts.Sy = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["y"]
+	a.ImageParts.Width = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["w"]
+	a.ImageParts.Height = a.SpriteSheet.Frames[a.Frames[a.currFrame]].Frame["h"]
+	a.LoopCompleted = false
 }
 
 //Pause the animation
@@ -69,4 +125,22 @@ func (a *Animation) Pause() {
 //Resume playing the animation
 func (a *Animation) Resume() {
 	a.paused = false
+}
+
+//Play the animation
+func (a *Animation) Play() {
+	a.paused = false
+}
+
+//IsPaused returns true if the animation is paused
+func (a Animation) IsPaused() bool {
+	return a.paused
+}
+
+//Stop the animation
+func (a *Animation) Stop() {
+	a.paused = true
+	a.LoopCompleted = false
+	a.frameCount = 0
+	a.currFrame = 0
 }
