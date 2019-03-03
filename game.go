@@ -33,18 +33,20 @@ type Game struct {
 	ImageManager                   *ImageManager
 	GameStateLoop                  GameHelperFunction
 	AudioPlayer                    *AudioPlayer
+	AdditionalCameras              map[string]*Camera
 }
 
 //NewGame returns a new Game while setting the width and height of the screen
 func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	game = &Game{
-		imageLoadedCh: make(chan *ImageManager),
-		audioLoadedCh: make(chan *AudioPlayer),
-		GameData:      NewGameData(),
-		Random:        rand.New(rand.NewSource(time.Now().UnixNano())),
-		Input:         NewInputController(),
-		DefaultCamera: CreateCamera(screenWidth, screenHeight),
-		ImageManager:  NewImageManager(),
+		imageLoadedCh:     make(chan *ImageManager),
+		audioLoadedCh:     make(chan *AudioPlayer),
+		GameData:          NewGameData(),
+		Random:            rand.New(rand.NewSource(time.Now().UnixNano())),
+		Input:             NewInputController(),
+		DefaultCamera:     CreateCamera(screenWidth, screenHeight),
+		ImageManager:      NewImageManager(),
+		AdditionalCameras: map[string]*Camera{},
 	}
 	game.UIController = NewUIController(game.Input)
 	game.AudioPlayer, err = NewAudioPlayer()

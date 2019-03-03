@@ -32,6 +32,11 @@ func RandomBetween(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
+//RandomBetweenf is the same as RandomBetween but takes and returns float64 values
+func RandomBetweenf(min, max float64) float64 {
+	return float64(RandomBetween(int(min), int(max)))
+}
+
 //Distance returns the scalar distance between two points
 func Distance(x, y, x1, y1 float64) float64 {
 
