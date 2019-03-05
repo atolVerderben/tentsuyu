@@ -34,6 +34,7 @@ type Game struct {
 	GameStateLoop                  GameHelperFunction
 	AudioPlayer                    *AudioPlayer
 	AdditionalCameras              map[string]*Camera
+	IsMobile                       bool
 }
 
 //NewGame returns a new Game while setting the width and height of the screen
@@ -141,6 +142,12 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 
 	return nil
 	//return ebitenutil.DebugPrint(screen, fmt.Sprintf("\nFPS: %.2f", ebiten.CurrentFPS()))
+}
+
+//SetMobile tells the game if it's on mobile or not
+//This is useful to know whether to check for touches or keys
+func (g *Game) SetMobile(m bool) {
+	g.IsMobile = m
 }
 
 //SetGameState of the game

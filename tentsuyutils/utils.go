@@ -28,7 +28,6 @@ func WithinDistance(x, x1, radius float64) bool {
 //RandomBetween returns a random int between min and max respectively
 //This is just a useful function for many reasons
 func RandomBetween(min, max int) int {
-	//rand.Seed(time.Now().Unix())
 	return rand.Intn(max-min) + min
 }
 
@@ -39,7 +38,15 @@ func RandomBetweenf(min, max float64) float64 {
 
 //Distance returns the scalar distance between two points
 func Distance(x, y, x1, y1 float64) float64 {
-
 	return math.Sqrt(math.Pow(x-x1, 2) + math.Pow(y-y1, 2))
+}
 
+//DegreeToRadian takes a given degree and returns the radian value
+func DegreeToRadian(degree float64) float64 {
+	return degree * math.Pi / 180
+}
+
+//RadianToDegree takes the radian value and returns the degree value
+func RadianToDegree(radian float64) float64 {
+	return radian * 180 / math.Pi
 }

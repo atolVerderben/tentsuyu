@@ -7,9 +7,9 @@ import (
 	//I want to accept png and jpg files by default
 	_ "image/jpeg"
 	_ "image/png"
-	"os"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 //NewImageManager creates a new pointer to ImageManager
@@ -27,14 +27,7 @@ type ImageManager struct {
 //LoadImageFromFile loads the given image at "path" with "name"
 func (im *ImageManager) LoadImageFromFile(name string, path string) error {
 
-	fImg1, _ := os.Open(path)
-	defer fImg1.Close()
-	img, _, err := image.Decode(fImg1)
-	if err != nil {
-		return err
-	}
-
-	img2, err := ebiten.NewImageFromImage(img, ebiten.FilterNearest)
+	img2, _, err := ebitenutil.NewImageFromFile(path, ebiten.FilterNearest)
 	if err != nil {
 		return err
 	}

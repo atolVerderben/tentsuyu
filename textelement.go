@@ -14,14 +14,14 @@ import (
 
 //TextElement contains the font, text, and position of that current text element
 type TextElement struct {
-	font                 *truetype.Font
-	Name                 string
-	drawImage            *ebiten.Image
-	fntSize, fntDpi      float64
-	text, prevText       []string
-	visible              bool
-	Stationary           bool
-	textColor, origColor color.Color
+	font                                 *truetype.Font
+	Name                                 string
+	drawImage                            *ebiten.Image
+	fntSize, fntDpi                      float64
+	text, prevText                       []string
+	visible                              bool
+	Stationary                           bool
+	textColor, origColor, highlightColor color.Color
 	*BasicUIElement
 }
 
@@ -42,6 +42,7 @@ func NewTextElement(x, y float64, w, h int, font *truetype.Font, text []string, 
 		textColor:      textColor,
 		origColor:      textColor,
 		visible:        true,
+		highlightColor: color.RGBA{153, 153, 0, 255},
 	}
 	t.drawText(t.text)
 	return t
@@ -65,9 +66,15 @@ func NewTextElementStationary(x, y float64, w, h int, font *truetype.Font, text 
 		origColor:      textColor,
 		visible:        true,
 		Stationary:     true,
+		highlightColor: color.RGBA{153, 153, 0, 255},
 	}
 	t.drawText(t.text)
 	return t
+}
+
+//SetHighlightColor sets the color of the text element when it's highlighted
+func (t *TextElement) SetHighlightColor(c color.Color) {
+	t.highlightColor = c
 }
 
 //Hide the TextElement
@@ -81,7 +88,7 @@ func (t *TextElement) Show() {
 }
 
 func (t *TextElement) Highlighted() bool {
-	t.textColor = color.RGBA{153, 153, 0, 255}
+	t.textColor = t.highlightColor
 	t.drawText(t.text)
 
 	return true
@@ -166,6 +173,7 @@ func (t *TextElement) ReturnText() string {
 	return t.text[0]
 }
 
+//SetPosition of TextElement to given x,y coords
 func (t *TextElement) SetPosition(x, y float64) {
 	t.X = x
 	t.Y = y
