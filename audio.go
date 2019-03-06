@@ -15,21 +15,19 @@ var (
 	audioContext *audio.Context
 )
 
-//PlaySE playes the sound effect with the given name
-func (p *AudioPlayer) PlaySE(se string) error {
-
-	sePlayer, _ := audio.NewPlayerFromBytes(p.audioContext, p.seBytes[se])
-	sePlayer.SetVolume(p.seVolume[se])
-	sePlayer.Play()
-
-	return nil
-
+// AudioPlayer represents the current audio state.
+type AudioPlayer struct {
+	audioContext      *audio.Context
+	current           time.Duration
+	total             time.Duration
+	seBytes           map[string][]byte
+	seVolume          map[string]float64
+	volume128         int
+	songs             map[string]*audio.Player
+	muteSE, muteMusic bool
 }
 
-func (p *AudioPlayer) ReturnSongPlayer(name string) *audio.Player {
-	return p.songs[name]
-}
-
+//NewAudioPlayer returns a new AudioPlayer
 func NewAudioPlayer() (*AudioPlayer, error) {
 	sampleRate := 44100
 	var err error
@@ -58,6 +56,40 @@ func NewAudioPlayer() (*AudioPlayer, error) {
 	return player, nil
 }
 
+//PlaySE playes the sound effect with the given name
+func (p *AudioPlayer) PlaySE(se string) error {
+	if p.muteSE {
+		return nil
+	}
+	sePlayer, _ := audio.NewPlayerFromBytes(p.audioContext, p.seBytes[se])
+	sePlayer.SetVolume(p.seVolume[se])
+	sePlayer.Play()
+
+	return nil
+
+}
+
+//MuteAll sets the mute state of both SoundEffects and Music
+func (p *AudioPlayer) MuteAll(m bool) {
+	p.muteSE = m
+	p.muteMusic = m
+}
+
+//IsSEMuted returns true if the sound effects are muted for the AudioPlayer
+func (p *AudioPlayer) IsSEMuted() bool {
+	return p.muteSE
+}
+
+//IsMusicMuted returns true if the music is muted for the AudioPlayer
+func (p *AudioPlayer) IsMusicMuted() bool {
+	return p.muteMusic
+}
+
+//ReturnSongPlayer returns the player for the song audio
+func (p *AudioPlayer) ReturnSongPlayer(name string) *audio.Player {
+	return p.songs[name]
+}
+
 //AddSoundEffectFromFile adds a SE of the given name and volume at the file location.
 //This format takes a WAV
 func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string, volume float64) error {
@@ -81,6 +113,7 @@ func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string, volume f
 	return nil
 }
 
+//AddSoundEffectFromBytes adds a new sound effect file from a byte slice
 func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume float64) error {
 
 	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
@@ -98,6 +131,7 @@ func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume flo
 	return nil
 }
 
+//AddSongFromFile to the AudioPlayer
 func (p *AudioPlayer) AddSongFromFile(name, filelocation string) error {
 	b, err := ioutil.ReadFile(filelocation)
 	if err != nil {
@@ -158,17 +192,8 @@ func (p *AudioPlayer) AddSongFromBytesMP3(name string, b []byte) error {
 	return nil
 }
 
-// Player represents the current audio state.
-type AudioPlayer struct {
-	audioContext *audio.Context
-	current      time.Duration
-	total        time.Duration
-	seBytes      map[string][]byte
-	seVolume     map[string]float64
-	volume128    int
-	songs        map[string]*audio.Player
-}
-
+//Update isn't currently used for the AudioPlayer
+//TODO: Implement this ... if necessary
 func (p *AudioPlayer) Update() error {
 	/*for _, se := range p.seSlice {
 		select {
@@ -187,6 +212,8 @@ func (p *AudioPlayer) Update() error {
 	return nil
 }
 
+//UpdateVolumeIfNeeded should be used to listen to changing the volume level
+//TODO: Implement this
 func (p *AudioPlayer) UpdateVolumeIfNeeded() {
 	if ebiten.IsKeyPressed(ebiten.KeyZ) {
 		p.volume128--

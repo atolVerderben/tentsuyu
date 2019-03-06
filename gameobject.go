@@ -28,6 +28,7 @@ type BasicObject struct {
 	VX, VY                           float64
 	NotCentered                      bool
 	Width, Height                    int
+	WidthF, HeightF                  float64
 	ID                               xid.ID
 }
 
@@ -148,11 +149,13 @@ func (obj *BasicObject) AddY(vY float64) {
 //NewBasicObject returns a new oject
 func NewBasicObject(x, y float64, w, h int) *BasicObject {
 	obj := &BasicObject{
-		ID:     xid.New(),
-		X:      x,
-		Y:      y,
-		Width:  w,
-		Height: h,
+		ID:      xid.New(),
+		X:       x,
+		Y:       y,
+		Width:   w,
+		Height:  h,
+		WidthF:  float64(w),
+		HeightF: float64(h),
 	}
 
 	return obj
