@@ -1,13 +1,16 @@
 package tentsuyu
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
 	"time"
 
+	"github.com/h2non/filetype"
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/audio"
 	"github.com/hajimehoshi/ebiten/audio/mp3"
+	"github.com/hajimehoshi/ebiten/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/audio/wav"
 )
 
@@ -91,35 +94,37 @@ func (p *AudioPlayer) ReturnSongPlayer(name string) *audio.Player {
 }
 
 //AddSoundEffectFromFile adds a SE of the given name and volume at the file location.
-//This format takes a WAV
 func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string, volume float64) error {
 	fb, err := ioutil.ReadFile(filelocation)
 	if err != nil {
 		return err
 	}
 
-	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
-	if err != nil {
-		log.Fatal(err)
-
-	}
-	b, err := ioutil.ReadAll(s)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	p.seBytes[name] = b
-	p.seVolume[name] = volume
-	return nil
+	return p.AddSoundEffectFromBytes(name, fb, volume)
 }
 
 //AddSoundEffectFromBytes adds a new sound effect file from a byte slice
 func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume float64) error {
+	var s io.Reader
+	var err error
+	if filetype.IsExtension(fb, "wav") {
+		s, err = wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		if err != nil {
+			log.Fatal(err)
 
-	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
-	if err != nil {
-		log.Fatal(err)
+		}
+	} else if filetype.IsExtension(fb, "mp3") {
+		s, err = mp3.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		if err != nil {
+			log.Fatal(err)
 
+		}
+	} else if filetype.IsExtension(fb, "ogg") {
+		s, err = vorbis.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		if err != nil {
+			log.Fatal(err)
+
+		}
 	}
 	b, err := ioutil.ReadAll(s)
 	if err != nil {
@@ -133,56 +138,36 @@ func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume flo
 
 //AddSongFromFile to the AudioPlayer
 func (p *AudioPlayer) AddSongFromFile(name, filelocation string) error {
-	b, err := ioutil.ReadFile(filelocation)
+
+	fb, err := ioutil.ReadFile(filelocation)
 	if err != nil {
 		return err
 	}
-	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(b))
-	if err != nil {
-		return err
-	}
-	a, err := audio.NewPlayer(audioContext, s)
-	if err != nil {
-		return err
-	}
-	p.songs[name] = a
-	return nil
+	return p.AddSongFromBytes(name, fb)
 }
 
-func (p *AudioPlayer) AddSongFromFileMP3(name, filelocation string) error {
-	b, err := ioutil.ReadFile(filelocation)
-	if err != nil {
-		return err
-	}
-	s, err := mp3.Decode(audioContext, audio.BytesReadSeekCloser(b))
-	if err != nil {
-		return err
-	}
-	a, err := audio.NewPlayer(audioContext, s)
-	if err != nil {
-		return err
-	}
-	p.songs[name] = a
-	return nil
-}
+//AddSongFromBytes takes the byte slice of the song file
+func (p *AudioPlayer) AddSongFromBytes(name string, fb []byte) error {
+	var s io.ReadCloser
+	var err error
+	if filetype.IsExtension(fb, "wav") {
+		s, err = wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		if err != nil {
+			log.Fatal(err)
 
-func (p *AudioPlayer) AddSongFromBytes(name string, b []byte) error {
-	s, err := wav.Decode(audioContext, audio.BytesReadSeekCloser(b))
-	if err != nil {
-		return err
-	}
-	a, err := audio.NewPlayer(audioContext, s)
-	if err != nil {
-		return err
-	}
-	p.songs[name] = a
-	return nil
-}
+		}
+	} else if filetype.IsExtension(fb, "mp3") {
+		s, err = mp3.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		if err != nil {
+			log.Fatal(err)
 
-func (p *AudioPlayer) AddSongFromBytesMP3(name string, b []byte) error {
-	s, err := mp3.Decode(audioContext, audio.BytesReadSeekCloser(b))
-	if err != nil {
-		return err
+		}
+	} else if filetype.IsExtension(fb, "ogg") {
+		s, err = vorbis.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		if err != nil {
+			log.Fatal(err)
+
+		}
 	}
 	a, err := audio.NewPlayer(audioContext, s)
 	if err != nil {

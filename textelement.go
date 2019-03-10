@@ -139,7 +139,7 @@ func (t *TextElement) drawText(text []string) error {
 		}
 		d.Dot = fixed.P(0, int(y))
 		d.DrawString(s)
-		y += t.fntSize
+		y += t.fntSize + 10
 	}
 
 	return t.drawImage.ReplacePixels(dst.Pix)
