@@ -36,8 +36,8 @@ type UIController struct {
 	input                     *InputController
 }
 
-//AddFont adds a new truetype font to the map
-func (ui *UIController) AddFont(fntName, fntFileLoc string) error {
+//AddFontFile adds a new truetype font from the given file location with the given name
+func (ui *UIController) AddFontFile(fntName, fntFileLoc string) error {
 
 	f, err := os.Open(fntFileLoc) //ebitenutil.OpenFile(fntFileLoc)
 	if err != nil {
@@ -60,7 +60,8 @@ func (ui *UIController) AddFont(fntName, fntFileLoc string) error {
 	return nil
 }
 
-func (ui *UIController) AddFontFile(fntName string, tt *truetype.Font) {
+//AddFont adds the given font with the given name to the ui fonts list
+func (ui *UIController) AddFont(fntName string, tt *truetype.Font) {
 	ui.fonts[fntName] = tt
 }
 

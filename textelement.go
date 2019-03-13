@@ -77,6 +77,12 @@ func (t *TextElement) SetHighlightColor(c color.Color) {
 	t.highlightColor = c
 }
 
+//SetTextColor sets the color of the text element
+func (t *TextElement) SetTextColor(c color.Color) {
+	t.textColor = c
+	t.origColor = c
+}
+
 //Hide the TextElement
 func (t *TextElement) Hide() {
 	t.visible = false
@@ -87,6 +93,7 @@ func (t *TextElement) Show() {
 	t.visible = true
 }
 
+//Highlighted sets the TextElement to its highlighted color
 func (t *TextElement) Highlighted() bool {
 	t.textColor = t.highlightColor
 	t.drawText(t.text)
@@ -94,6 +101,7 @@ func (t *TextElement) Highlighted() bool {
 	return true
 }
 
+//UnHighlighted returns the TextElement to its original color
 func (t *TextElement) UnHighlighted() bool {
 	t.textColor = t.origColor
 	t.drawText(t.text)
@@ -101,6 +109,7 @@ func (t *TextElement) UnHighlighted() bool {
 	return true
 }
 
+//SetFontSize of the TextElement
 func (t *TextElement) SetFontSize(fntSize float64) {
 	t.fntSize = fntSize
 }
