@@ -22,6 +22,7 @@ type UIElement interface {
 	Size() (int, int)
 	SetSize(int, int)
 	Contains(float64, float64) bool
+	SetHighlightColor(color.Color)
 }
 
 //UIController controls all UI elements
@@ -198,7 +199,7 @@ func (ui *UIController) Update() {
 	}
 	for i := range ui.menus {
 		if ui.menus[i].Active {
-			ui.menus[i].Update(ui.input)
+			ui.menus[i].Update(ui.input, 0, 0) //TODO: I need to update this to work without offsets
 		}
 	}
 	if ui.customCursor == true {

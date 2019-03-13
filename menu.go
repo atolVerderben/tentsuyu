@@ -67,7 +67,7 @@ func (m *Menu) PressSelected() {
 }
 
 //Update the menu
-func (m *Menu) Update(input *InputController) {
+func (m *Menu) Update(input *InputController, offsetX, offsetY float64) {
 	//log.Printf("%v,%v\n", m.maxWidth, m.maxHeight)
 	//m.x = Components.Camera.GetX()
 	//m.y = Components.Camera.GetY()
@@ -89,7 +89,7 @@ func (m *Menu) Update(input *InputController) {
 			}
 
 			//m.elements[x][y].UIElement.SetPosition(mx, my)
-			if m.Elements[x][y].Update(input) {
+			if m.Elements[x][y].Update(input, offsetX, offsetY) {
 				m.selectedCol = -1
 				m.selectedRow = -1
 			}
@@ -122,7 +122,9 @@ func (m *Menu) Draw(screen *ebiten.Image) {
 	}
 	for x := range m.Elements {
 		for y := range m.Elements[x] {
-			m.Elements[x][y].UIElement.Draw(screen)
+			if !m.Elements[x][y].hidden {
+				m.Elements[x][y].UIElement.Draw(screen)
+			}
 		}
 	}
 }
@@ -199,6 +201,7 @@ type MenuElement struct {
 	Action                  func()
 	highlighted, Selectable bool
 	menuX, menuY            float64
+	hidden                  bool
 }
 
 //SetAction of the MenuElement
@@ -212,9 +215,12 @@ func (m *MenuElement) SetAction(function func()) {
 }
 
 //Update the MenuElement
-func (m *MenuElement) Update(input *InputController) bool {
+func (m *MenuElement) Update(input *InputController, offsetX, offsetY float64) bool {
+	if m.hidden {
+		return false
+	}
 	mouseHighlight := false
-	if m.UIElement.Contains(input.Mouse.X, input.Mouse.Y) {
+	if m.UIElement.Contains(input.Mouse.X+offsetX, input.Mouse.Y+offsetY) {
 		if m.Selectable {
 			mouseHighlight = true
 			m.Highlighted()
@@ -235,4 +241,9 @@ func (m *MenuElement) Update(input *InputController) bool {
 
 	m.UIElement.Update()
 	return mouseHighlight
+}
+
+//Hide takes a bool and sets the hidden variable
+func (m *MenuElement) Hide(h bool) {
+	m.hidden = h
 }
