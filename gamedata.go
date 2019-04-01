@@ -38,13 +38,14 @@ type GameData struct {
 	gameMode  GameMode
 	highScore float64
 	currScore float64
-	Settings  map[string]GameValuePair
+	Settings  map[string]*GameValuePair
 }
 
 //NewGameData creates a new GameData
 func NewGameData() *GameData {
 	g := &GameData{
 		startTime: time.Now(),
+		Settings:  map[string]*GameValuePair{},
 	}
 
 	return g

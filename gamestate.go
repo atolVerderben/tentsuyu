@@ -8,7 +8,7 @@ type GameState interface {
 	SetMsg(GameStateMsg)
 }
 
-//GameStateMsg is what it is
+//GameStateMsg represents
 type GameStateMsg string
 
 const (
@@ -18,27 +18,38 @@ const (
 	GameStateMsgPause = "Paused"
 	//GameStateMsgUnPause resumes the game from a paused state
 	GameStateMsgUnPause = "UnPaused"
+	//GameStateMsgNotStarted is used to call the game init
+	GameStateMsgNotStarted = "Game Not Init"
 )
 
-func defaultGameState() GameState {
-	return &defaultGS{}
+//NewBaseGameState returns a BaseGameState with default GameStateMessage
+func NewBaseGameState() GameState {
+	return &BaseGameState{
+		GameStateMessage: GameStateMsgNotStarted,
+	}
 }
 
-type defaultGS struct {
+//BaseGameState implements the basic methods to satisfy the GameState interface
+type BaseGameState struct {
+	GameStateMessage GameStateMsg
 }
 
-func (d *defaultGS) Update(g *Game) error {
+//Update is a dummy method for BaseGameState
+func (b *BaseGameState) Update(g *Game) error {
 	return nil
 }
 
-func (d *defaultGS) Draw(g *Game) error {
+//Draw is a dummy method for BaseGameState
+func (b *BaseGameState) Draw(g *Game) error {
 	return nil
 }
 
-func (d *defaultGS) Msg() GameStateMsg {
-	return GameStateMsgNone
+//Msg returns the GameStateMessage of the BaseGameState
+func (b *BaseGameState) Msg() GameStateMsg {
+	return b.GameStateMessage
 }
 
-func (d *defaultGS) SetMsg(g GameStateMsg) {
-
+//SetMsg sets the GameStateMessage of BaseGameState to the passed parameter
+func (b *BaseGameState) SetMsg(g GameStateMsg) {
+	b.GameStateMessage = g
 }

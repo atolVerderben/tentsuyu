@@ -462,7 +462,3 @@ func (c *Camera) Shake() {
 		//c.y = c.preShakeY
 	}
 }
-
-func (c *Camera) ShakeALittle() {
-
-}

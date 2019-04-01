@@ -19,22 +19,21 @@ type GameLoadAudioFunction func() *AudioPlayer
 
 //Game represents, well... the game
 type Game struct {
-	imageLoadedCh                  chan *ImageManager
-	audioLoadedCh                  chan *AudioPlayer
-	gameState                      GameState
-	pausedState                    GameState
-	GameData                       *GameData
-	Screen                         *ebiten.Image
-	DefaultCamera                  *Camera
-	UIController                   *UIController
-	Random                         *rand.Rand
-	highScoreDisplay, scoreDisplay *MenuElement
-	Input                          *InputController
-	ImageManager                   *ImageManager
-	GameStateLoop                  GameHelperFunction
-	AudioPlayer                    *AudioPlayer
-	AdditionalCameras              map[string]*Camera
-	IsMobile                       bool
+	imageLoadedCh     chan *ImageManager
+	audioLoadedCh     chan *AudioPlayer
+	gameState         GameState
+	PausedState       GameState
+	GameData          *GameData
+	Screen            *ebiten.Image
+	DefaultCamera     *Camera
+	UIController      *UIController
+	Random            *rand.Rand
+	Input             *InputController
+	ImageManager      *ImageManager
+	GameStateLoop     GameHelperFunction
+	AudioPlayer       *AudioPlayer
+	AdditionalCameras map[string]*Camera
+	IsMobile          bool
 }
 
 //NewGame returns a new Game while setting the width and height of the screen
@@ -54,6 +53,11 @@ func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	if err != nil {
 		return nil, err
 	}
+
+	//=====================================
+	//Create Default Inputs
+	//All inputs can be overriden
+	//=====================================
 
 	//Basic Default Inputs
 	game.Input.RegisterButton("Up", ebiten.KeyW, ebiten.KeyUp)
@@ -111,10 +115,9 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 
 	g.Input.Update()
 	g.Screen = screen
-	//g.Screen.Fill(color.RGBA{R: 192, G: 192, B: 192, A: 255})
 
 	if g.gameState == nil {
-		g.gameState = defaultGameState()
+		g.gameState = NewBaseGameState()
 
 	} else {
 		if err := g.GameStateLoop(); err != nil {
@@ -122,22 +125,21 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 		}
 	}
 
-	g.gameState.Update(g)
+	if err := g.gameState.Update(g); err != nil {
+		return err
+	}
 	g.GameData.Update()
 	g.UIController.Update()
 	if g.Input.Button("ToggleFullscreen").JustPressed() {
 		g.ToggleFullscreen()
 	}
 	if !ebiten.IsRunningSlowly() {
-		//g.background.Draw(g.screen, true)
 		if err := g.gameState.Draw(g); err != nil {
 			return err
 		}
-		//g.scoreDisplay.Update()
-		//g.highScoreDisplay.Update()
-		//g.scoreDisplay.Draw(g.Screen)
-		//g.highScoreDisplay.Draw(g.Screen)
-		g.UIController.Draw(g.Screen)
+		if err := g.UIController.Draw(g.Screen); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -161,17 +163,17 @@ func (g Game) GetGameState() GameState {
 }
 
 //SetPauseState of the game
-//This changes the pausedState to the current GameState then switches to the passed GameState.
+//This changes the PausedState to the current GameState then switches to the passed GameState.
 //Used to preserve the current game state
 func (g *Game) SetPauseState(gs GameState) {
-	g.pausedState = g.gameState
+	g.PausedState = g.gameState
 	g.gameState = gs
-	g.pausedState.SetMsg(GameStateMsgNone)
+	g.PausedState.SetMsg(GameStateMsgNone)
 }
 
 //UnPause switches back the the puasedState GameState of the Game
 func (g *Game) UnPause() {
-	g.gameState = g.pausedState
+	g.gameState = g.PausedState
 }
 
 //SetGameStateLoop should be a switch statement telling the game when to switch to what gamestate
