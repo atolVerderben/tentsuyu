@@ -125,6 +125,14 @@ func ReadMapfromString(jString string) *Map {
 	return m
 }
 
+//ReadMapfromByte reads an entire Map struct from a byte slice
+func ReadMapfromByte(byteMap []byte) *Map {
+
+	m := &Map{}
+	json.Unmarshal(byteMap, m)
+	return m
+}
+
 func CreateTileMapFromFile(fileLocation string, imageManager *ImageManager) *TileMap {
 	tilemap := ReadMap(fileLocation)
 	return CreateTileMap(tilemap, imageManager)

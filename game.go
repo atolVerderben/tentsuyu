@@ -2,7 +2,6 @@ package tentsuyu
 
 import (
 	"math/rand"
-	"time"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -39,10 +38,10 @@ type Game struct {
 //NewGame returns a new Game while setting the width and height of the screen
 func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	game = &Game{
-		imageLoadedCh:     make(chan *ImageManager),
-		audioLoadedCh:     make(chan *AudioPlayer),
-		GameData:          NewGameData(),
-		Random:            rand.New(rand.NewSource(time.Now().UnixNano())),
+		imageLoadedCh: make(chan *ImageManager),
+		audioLoadedCh: make(chan *AudioPlayer),
+		GameData:      NewGameData(),
+		//Random:            rand.New(rand.NewSource(time.Now().UnixNano())),
 		Input:             NewInputController(),
 		DefaultCamera:     CreateCamera(screenWidth, screenHeight),
 		ImageManager:      NewImageManager(),
