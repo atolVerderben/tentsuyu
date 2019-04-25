@@ -124,3 +124,8 @@ func VectorMul(v Vector2d, r float64) *Vector2d {
 func (v Vector2d) ToString() string {
 	return fmt.Sprintf("{X:%f, Y:%f}", v.X, v.Y)
 }
+
+//Angle between two vectors
+func (v Vector2d) Angle(u Vector2d) float64 {
+	return math.Atan2(u.Y-v.Y, u.X-v.X)
+}

@@ -12,48 +12,48 @@ import (
 
 //Map represents an entire Tiled map
 type Map struct {
-	Width       int                  `json:"width"`
-	Height      int                  `json:"height"`
-	Layers      []*Layer             `json:"layers"`
-	Orientation string               `json:"orientation"`
-	TileWidth   int                  `json:"tilewidth"`
-	TileHeight  int                  `json:"tileheight"`
-	TileSets    []*TileSet           `json:"tilesets"`
-	Properties  map[string]*Property `json:"properties"`
-	Version     int                  `json:"version"`
+	Width       int         `json:"width"`
+	Height      int         `json:"height"`
+	Layers      []*Layer    `json:"layers"`
+	Orientation string      `json:"orientation"`
+	TileWidth   int         `json:"tilewidth"`
+	TileHeight  int         `json:"tileheight"`
+	TileSets    []*TileSet  `json:"tilesets"`
+	Properties  []*Property `json:"properties"`
+	Version     int         `json:"version"`
 }
 
 //Layer represents a Tiled Layer
 type Layer struct {
-	Name       string               `json:"name"`
-	Type       string               `json:"type"`
-	X          int                  `json:"x"`
-	Y          int                  `json:"y"`
-	Width      int                  `json:"width"`
-	Height     int                  `json:"height"`
-	Data       []int                `json:"data"`
-	Opacity    int                  `json:"opacity"`
-	Visible    bool                 `json:"visible"`
-	Properties map[string]*Property `json:"properties"`
-	DrawOrder  string               `json:"draworder"`
-	Objects    []*MapObject         `json:"objects"`
+	Name       string       `json:"name"`
+	Type       string       `json:"type"`
+	X          int          `json:"x"`
+	Y          int          `json:"y"`
+	Width      int          `json:"width"`
+	Height     int          `json:"height"`
+	Data       []int        `json:"data"`
+	Opacity    int          `json:"opacity"`
+	Visible    bool         `json:"visible"`
+	Properties []*Property  `json:"properties"`
+	DrawOrder  string       `json:"draworder"`
+	Objects    []*MapObject `json:"objects"`
 	//	ImageName  string               `json:"image"`
 }
 
 //TileSet represents a Tiled TileSet
 type TileSet struct {
-	FirstGID      int                  `json:"firstgid"`
-	ImageName     string               `json:"image"`
-	ImageWidth    int                  `json:"imagewidth"`
-	ImageHeight   int                  `json:"imageheight"`
-	Margin        int                  `json:"margin"`
-	Name          string               `json:"name"`
-	Properties    map[string]*Property `json:"properties"`
-	Spacing       int                  `json:"spacing"`
-	TileWidth     int                  `json:"tilewidth"`
-	TileHeight    int                  `json:"tileheight"`
-	Columns       int                  `json:"columns"`
-	TileCount     int                  `json:"tilecount"`
+	FirstGID      int         `json:"firstgid"`
+	ImageName     string      `json:"image"`
+	ImageWidth    int         `json:"imagewidth"`
+	ImageHeight   int         `json:"imageheight"`
+	Margin        int         `json:"margin"`
+	Name          string      `json:"name"`
+	Properties    []*Property `json:"properties"`
+	Spacing       int         `json:"spacing"`
+	TileWidth     int         `json:"tilewidth"`
+	TileHeight    int         `json:"tileheight"`
+	Columns       int         `json:"columns"`
+	TileCount     int         `json:"tilecount"`
 	Image         *ebiten.Image
 	Rows, LastGID int
 }
@@ -72,7 +72,11 @@ type MapObject struct {
 }
 
 //Property of the layer/tile from Tiled
-type Property string
+type Property struct {
+	Name     string `json:"name"`
+	PropType string `json:"type"`
+	Value    string `json:"value"`
+}
 
 //Tile is a renderable tile used by the game
 type Tile struct {
@@ -101,6 +105,7 @@ type TileLayer struct {
 	ImageName     string
 	X, Y          float64
 	Width, Height int
+	Properties    []*Property
 }
 
 //ReadMap from JSON file and dump into Map
@@ -133,14 +138,14 @@ func ReadMapfromByte(byteMap []byte) *Map {
 	return m
 }
 
-func CreateTileMapFromFile(fileLocation string, imageManager *ImageManager) *TileMap {
+func CreateTileMapFromFile(fileLocation string) *TileMap {
 	tilemap := ReadMap(fileLocation)
-	return CreateTileMap(tilemap, imageManager)
+	return CreateTileMap(tilemap)
 
 }
 
 //CreateTileMap creates a renderable TileMap
-func CreateTileMap(tilemap *Map, imageManager *ImageManager) *TileMap {
+func CreateTileMap(tilemap *Map) *TileMap {
 	tm := &TileMap{
 		Layers:     []*TileLayer{},
 		Width:      tilemap.Width,
@@ -148,7 +153,7 @@ func CreateTileMap(tilemap *Map, imageManager *ImageManager) *TileMap {
 		TileHeight: tilemap.TileHeight,
 		TileWidth:  tilemap.TileWidth,
 	}
-	PrepareTileSet(tilemap, imageManager)
+	PrepareTileSet(tilemap)
 	for _, layer := range tilemap.Layers {
 		if layer.Type == "imagelayer" {
 			tl := &TileLayer{
@@ -159,6 +164,7 @@ func CreateTileMap(tilemap *Map, imageManager *ImageManager) *TileMap {
 				Y:            float64(layer.Y),
 				Width:        layer.Width * tilemap.TileWidth,
 				Height:       layer.Height * tilemap.TileHeight,
+				Properties:   layer.Properties,
 			}
 			tm.Layers = append(tm.Layers, tl)
 		}
@@ -167,12 +173,12 @@ func CreateTileMap(tilemap *Map, imageManager *ImageManager) *TileMap {
 				Name: layer.Name,
 				Data: []*Tile{},
 			}
-			if layer.Properties["collision"] != nil {
+			/*if layer.Properties["collision"] != nil {
 				tl.Collide = true
 			}
 			if layer.Properties["above"] != nil {
 				tl.Above = true
-			}
+			}*/
 			rowRange := 0
 			//rowTiles := []*Tile{}
 			x := 0.0
@@ -182,16 +188,11 @@ func CreateTileMap(tilemap *Map, imageManager *ImageManager) *TileMap {
 				rowRange++
 				if tileData != 0 {
 					t := &Tile{
-						Gid: tileData,
-						BasicObject: &BasicObject{
-							Height:      tilemap.TileHeight,
-							Width:       tilemap.TileWidth,
-							X:           x,
-							Y:           y,
-							NotCentered: true,
-						},
-						ImageName: tl.ImageName,
+						Gid:         tileData,
+						BasicObject: NewBasicObject(x, y, tilemap.TileWidth, tilemap.TileHeight),
+						ImageName:   tl.ImageName,
 					}
+					t.NotCentered = true
 					t.DetermineTileSet(tilemap)
 					tl.Data = append(tl.Data, t)
 
@@ -223,7 +224,8 @@ func (t *Tile) DetermineTileSet(tilemap *Map) {
 	for _, tileSet := range tilemap.TileSets {
 		if tileSet.FirstGID <= t.Gid {
 			if tileSet.LastGID >= t.Gid || tileSet.LastGID == tileSet.FirstGID {
-				t.Image = tileSet.Image
+				//t.Image = tileSet.Image
+
 				t.ImageName = tileSet.Name
 				sx, sy := tileSet.ReturnImagePosition(t.Gid)
 				t.BasicImageParts = &BasicImageParts{
@@ -294,11 +296,11 @@ func (tm *TileMap) Draw(screen *ebiten.Image, imageManager *ImageManager) error 
 }
 
 //PrepareTileSet imports the tileset image, and sets LastGID and Rows for easier calculation
-func PrepareTileSet(tilemap *Map, imageManager *ImageManager) {
+func PrepareTileSet(tilemap *Map) { //, imageManager *ImageManager) {
 	for x, tileSet := range tilemap.TileSets {
-		image := imageManager.ReturnImage(tilemap.TileSets[x].Name) //ebitenutil.NewImageFromFile(tilemap.TileSets[x].ImageName, ebiten.FilterNearest)
+		//image := imageManager.ReturnImage(tilemap.TileSets[x].Name) //ebitenutil.NewImageFromFile(tilemap.TileSets[x].ImageName, ebiten.FilterNearest)
 
-		tilemap.TileSets[x].Image = image
+		//tilemap.TileSets[x].Image = image
 		tilemap.TileSets[x].LastGID = tileSet.FirstGID + tileSet.TileCount
 		tilemap.TileSets[x].Rows = tileSet.ImageHeight / tileSet.TileHeight
 	}

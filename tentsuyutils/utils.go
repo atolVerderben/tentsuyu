@@ -50,3 +50,8 @@ func DegreeToRadian(degree float64) float64 {
 func RadianToDegree(radian float64) float64 {
 	return radian * 180 / math.Pi
 }
+
+//AngleBetween returns the float64 angle of the given 2 sets of x,y coords
+func AngleBetween(x1, y1, x2, y2 float64) float64 {
+	return math.Atan2(y2-y1, x2-x1)
+}

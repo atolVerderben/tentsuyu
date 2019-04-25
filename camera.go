@@ -25,6 +25,7 @@ type Camera struct {
 	offSetX, offSetY                                               float64
 	lowerBoundX, upperBoundX                                       float64
 	lowerBoundY, upperBoundY                                       float64
+	clamp                                                          bool
 }
 
 //CreateCamera intializes a camera struct
@@ -41,6 +42,7 @@ func CreateCamera(width, height float64) *Camera {
 		MaxZoomIn:      2.0,
 		shakeRadius:    60.0,
 		freeFloatSpeed: 2.0,
+		clamp:          true,
 	}
 	return c
 }
@@ -409,6 +411,10 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 		} else { // Stop at top
 			c.y = lowerHeight
 		}
+	}
+	if c.clamp {
+		c.x = math.Round(c.x)
+		c.y = math.Round(c.y)
 	}
 }
 

@@ -223,10 +223,10 @@ func (obj *BasicObject) Contains(srcX, srcY float64) bool {
 	}
 
 	xIn, yIn := false, false
-	if srcX < obj.Right() && srcX > obj.Left() {
+	if srcX <= obj.Right() && srcX >= obj.Left() {
 		xIn = true
 	}
-	if srcY < obj.Bottom() && srcY > obj.Top() {
+	if srcY <= obj.Bottom() && srcY >= obj.Top() {
 		yIn = true
 	}
 	return xIn && yIn
@@ -264,10 +264,10 @@ func (obj *BasicObject) BottomNoCenter() float64 {
 func (obj *BasicObject) ContainsNoCenter(srcX, srcY float64) bool {
 
 	xIn, yIn := false, false
-	if srcX < obj.RightNoCenter() && srcX > obj.LeftNoCenter() {
+	if srcX <= obj.RightNoCenter() && srcX >= obj.LeftNoCenter() {
 		xIn = true
 	}
-	if srcY < obj.BottomNoCenter() && srcY > obj.TopNoCenter() {
+	if srcY <= obj.BottomNoCenter() && srcY >= obj.TopNoCenter() {
 		yIn = true
 	}
 	return xIn && yIn
