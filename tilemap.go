@@ -138,6 +138,7 @@ func ReadMapfromByte(byteMap []byte) *Map {
 	return m
 }
 
+//CreateTileMapFromFile creates a new TileMap based on the given filelocation
 func CreateTileMapFromFile(fileLocation string) *TileMap {
 	tilemap := ReadMap(fileLocation)
 	return CreateTileMap(tilemap)

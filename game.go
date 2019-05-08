@@ -10,6 +10,9 @@ import (
 //GameHelperFunction is a function that takes no parameters and returns an error
 type GameHelperFunction func() error
 
+//GameDrawHelperFunction is meant to draw something on the passed ebiten.Image
+type GameDrawHelperFunction func(*ebiten.Image) error
+
 //GameLoadImagesFunction returns an ImageManager which is used to load new images into the game
 type GameLoadImagesFunction func() *ImageManager
 
@@ -30,6 +33,7 @@ type Game struct {
 	Input             *InputController
 	ImageManager      *ImageManager
 	GameStateLoop     GameHelperFunction
+	GameDrawLoop      GameDrawHelperFunction
 	AudioPlayer       *AudioPlayer
 	AdditionalCameras map[string]*Camera
 	IsMobile          bool
@@ -49,6 +53,10 @@ func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	}
 	game.UIController = NewUIController(game.Input)
 	game.AudioPlayer, err = NewAudioPlayer()
+	game.SetGameDrawLoop(func(screen *ebiten.Image) error {
+
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -139,6 +147,9 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 		if err := g.UIController.Draw(g.Screen); err != nil {
 			return err
 		}
+		if err := g.GameDrawLoop(g.Screen); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -179,6 +190,11 @@ func (g *Game) UnPause() {
 //This is where your gamestate logic will exist
 func (g *Game) SetGameStateLoop(gFunction GameHelperFunction) {
 	g.GameStateLoop = gFunction
+}
+
+//SetGameDrawLoop allows the user to add a final draw over the game screen no matter what state the game is in.
+func (g *Game) SetGameDrawLoop(gFunction GameDrawHelperFunction) {
+	g.GameDrawLoop = gFunction
 }
 
 //LoadImages will set the imageLoadedCh to the passed GameHlperFunction

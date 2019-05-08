@@ -362,6 +362,15 @@ func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64
 	}
 }
 
+//FollowObject follows the given GameObject either within or without bounds
+func (c *Camera) FollowObject(player GameObject, bounds bool) {
+	if bounds {
+		c.FollowObjectInBounds(player)
+	} else {
+		c.FollowObjectNoBounds(player)
+	}
+}
+
 //FollowObjectInBounds follows the given GameObject within the bounds of the camera
 func (c *Camera) FollowObjectInBounds(player GameObject) {
 
@@ -412,6 +421,30 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 			c.y = lowerHeight
 		}
 	}
+	if c.clamp {
+		c.x = math.Round(c.x)
+		c.y = math.Round(c.y)
+	}
+}
+
+//FollowObjectNoBounds follows the given GameObject without boundaries
+func (c *Camera) FollowObjectNoBounds(player GameObject) {
+
+	x, y := player.GetPosition()
+	x, y = (x+c.offSetX)*c.Zoom, (y+c.offSetY)*c.Zoom
+
+	// X-Axis
+
+	// Follow Player Freely
+
+	c.x = (x - c.Width/2)
+
+	// Y-Axis
+
+	// Follow Player Freely
+
+	c.y = y - c.Height/2
+
 	if c.clamp {
 		c.x = math.Round(c.x)
 		c.y = math.Round(c.y)

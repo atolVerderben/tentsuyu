@@ -88,6 +88,8 @@ func (ui *UIController) DeActivateMenu(name string) {
 
 }
 
+//ActiveMenu returns the name of the active menu.
+//Returns "None Active" if there is no active menu.
 func (ui *UIController) ActiveMenu() string {
 	for name, value := range ui.menus {
 		if value.Active {
