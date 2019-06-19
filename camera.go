@@ -66,8 +66,10 @@ func (c *Camera) SetZoom(zoom float64) {
 	c.Zoom = zoom
 }
 
-func (c *Camera) SetZoomGradual(zoom float64) {
-
+//SetZoomGradual zooms into the passed zoom value and a given speed
+//TODO: Implement this
+func (c *Camera) SetZoomGradual(zoom, speed float64) {
+	c.SetZoom(zoom) //temporarily just call SetZoom
 }
 
 //GetOffsetX returns the camera X offset position

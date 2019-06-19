@@ -122,6 +122,14 @@ func (a *Animation) Pause() {
 	a.paused = true
 }
 
+//Reset the animation to the starting point
+func (a *Animation) Reset() {
+	a.paused = false
+	a.LoopCompleted = false
+	a.frameCount = 0
+	a.currFrame = 0
+}
+
 //Resume playing the animation
 func (a *Animation) Resume() {
 	a.paused = false
