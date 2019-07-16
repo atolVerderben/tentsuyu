@@ -41,7 +41,7 @@ func CreateCamera(width, height float64) *Camera {
 		MaxZoomOut:     0.1,
 		MaxZoomIn:      2.0,
 		shakeRadius:    60.0,
-		freeFloatSpeed: 2.0,
+		freeFloatSpeed: 4.5,
 		clamp:          true,
 	}
 	return c
@@ -118,6 +118,10 @@ func (c *Camera) CenterY(y float64) {
 	c.y = y - c.Height/2
 }
 
+func (c *Camera) GetDestination() (float64, float64) {
+	return c.destX, c.destY
+}
+
 //ChangeZoom increments or decrements the camera zoom level
 func (c *Camera) ChangeZoom() {
 	if c.zoomCount > 0 {
@@ -139,27 +143,19 @@ func (c *Camera) ChangeZoom() {
 	}
 }
 
+func (c *Camera) SetSpeed(s float64) {
+	c.freeFloatSpeed = s
+}
+
 func (c *Camera) moveToDestination() {
 	//moveX, moveY := false, false
 	if c.moving {
-		if c.destX != c.x {
-			//moveX = true
-			if c.destX > c.x {
-				c.x += c.freeFloatSpeed
-			} else {
-				c.x -= c.freeFloatSpeed
-			}
-		}
-		if c.destY != c.y {
-			//moveY = true
-			if c.destY > c.y {
-				c.y += c.freeFloatSpeed
-			} else {
-				c.y -= c.freeFloatSpeed
-			}
-		}
+		angle := math.Atan2(c.destY-c.y, c.destX-c.x)
 
-		if tentsuyutils.NearCoords(c.x, c.y, c.destX, c.destY, 5) {
+		c.x += c.freeFloatSpeed * math.Cos(angle)
+		c.y += c.freeFloatSpeed * math.Sin(angle)
+
+		if tentsuyutils.Distance(c.x, c.y, c.destX, c.destY) <= 5 {
 			c.moving = false
 			c.x = c.destX
 			c.y = c.destY
@@ -305,6 +301,10 @@ func (c *Camera) Update() {
 
 	if c.moving {
 		c.moveToDestination()
+		if c.clamp {
+			c.x = math.Round(c.x)
+			c.y = math.Round(c.y)
+		}
 	}
 
 }
@@ -404,11 +404,11 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 	if !cameraOverWidth {
 		// Follow Player Freely
 		if x-c.Width/2 > lowerWidth && x+c.Width/2 < worldWidth {
-			c.x = (x - c.Width/2)
+			c.destX = (x - c.Width/2)
 		} else if x+c.Width/2 >= worldWidth { // Stop at right edge
-			c.x = worldWidth - c.Width
+			c.destX = worldWidth - c.Width
 		} else { // Stop at left edge
-			c.x = lowerWidth
+			c.destX = lowerWidth
 		}
 	}
 
@@ -416,17 +416,18 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 	if !cameraOverHeight {
 		// Follow Player Freely
 		if y-c.Height/2 > lowerHeight && y+c.Height/2 < worldHeight {
-			c.y = y - c.Height/2
+			c.destY = y - c.Height/2
 		} else if y+c.Height/2 >= worldHeight { // Stop at bottom
-			c.y = worldHeight - c.Height
+			c.destY = worldHeight - c.Height
 		} else { // Stop at top
-			c.y = lowerHeight
+			c.destY = lowerHeight
 		}
 	}
 	if c.clamp {
 		c.x = math.Round(c.x)
 		c.y = math.Round(c.y)
 	}
+	c.moving = true
 }
 
 //FollowObjectNoBounds follows the given GameObject without boundaries

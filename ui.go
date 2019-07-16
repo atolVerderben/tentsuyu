@@ -156,7 +156,7 @@ func (ui *UIController) SetCustomCursor(width, height, sx, sy int, spritesheet *
 			Width:  width,
 			Height: height,
 		},
-		style:       CursorCrosshair,
+		style:       CursorPointer,
 		spritesheet: spritesheet,
 	}
 	ui.DrawCursor = true
