@@ -23,9 +23,9 @@ const (
 )
 
 //NewBaseGameState returns a BaseGameState with default GameStateMessage
-func NewBaseGameState() GameState {
+func NewBaseGameState() *BaseGameState {
 	return &BaseGameState{
-		GameStateMessage: GameStateMsgNotStarted,
+		GameStateMessage: GameStateMsgNone,
 	}
 }
 

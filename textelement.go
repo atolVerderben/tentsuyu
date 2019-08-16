@@ -14,6 +14,7 @@ import (
 
 //TextElement contains the font, text, and position of that current text element
 type TextElement struct {
+	dropShadow                           bool
 	font                                 *truetype.Font
 	Name                                 string
 	drawImage                            *ebiten.Image
@@ -43,6 +44,7 @@ func NewTextElement(x, y float64, w, h int, font *truetype.Font, text []string, 
 		origColor:      textColor,
 		visible:        true,
 		highlightColor: color.RGBA{153, 153, 0, 255},
+		dropShadow:     true,
 	}
 	t.drawText(t.text)
 	return t
@@ -142,7 +144,7 @@ func (t *TextElement) drawText(text []string) error {
 	}
 	y := t.fntSize
 	for _, s := range text {
-		if t.fntSize > 16 {
+		if t.dropShadow {
 			d2.Dot = fixed.P(+2, int(y+2))
 			d2.DrawString(s)
 		}
@@ -153,6 +155,11 @@ func (t *TextElement) drawText(text []string) error {
 
 	return t.drawImage.ReplacePixels(dst.Pix)
 
+}
+
+//SetDropShadow of the TextElement. If true then a second outline will be drawn.
+func (t *TextElement) SetDropShadow(drop bool) {
+	t.dropShadow = drop
 }
 
 //Update TextElement

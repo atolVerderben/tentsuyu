@@ -30,6 +30,7 @@ type BasicObject struct {
 	Width, Height                    int
 	WidthF, HeightF                  float64
 	ID                               xid.ID
+	isCentered                       bool
 }
 
 //SetCollision2D will allow the object to use more advanced collision functions
@@ -149,13 +150,14 @@ func (obj *BasicObject) AddY(vY float64) {
 //NewBasicObject returns a new oject
 func NewBasicObject(x, y float64, w, h int) *BasicObject {
 	obj := &BasicObject{
-		ID:      xid.New(),
-		X:       x,
-		Y:       y,
-		Width:   w,
-		Height:  h,
-		WidthF:  float64(w),
-		HeightF: float64(h),
+		ID:         xid.New(),
+		X:          x,
+		Y:          y,
+		Width:      w,
+		Height:     h,
+		WidthF:     float64(w),
+		HeightF:    float64(h),
+		isCentered: true,
 	}
 
 	return obj
@@ -294,4 +296,11 @@ func (obj *BasicObject) Draw(screen *ebiten.Image) error {
 //This is useful for vector math
 func (obj BasicObject) ReturnVectorPosition() Vector2d {
 	return Vector2d{X: obj.X, Y: obj.Y}
+}
+
+//SetCentered of the object. If true the object coords refer to the center of the object.
+//If false the object coords refer to the top left of the object.
+func (obj *BasicObject) SetCentered(isCentered bool) {
+	obj.NotCentered = !isCentered
+	obj.isCentered = isCentered
 }

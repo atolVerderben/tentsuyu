@@ -19,9 +19,9 @@ type Menu struct {
 func NewMenu(screenWidth, screenHeight float64) *Menu {
 	m := &Menu{
 		midStartX:   screenWidth / 2,
-		midStartY:   screenHeight / 4,
-		paddingX:    10,
-		paddingY:    20,
+		midStartY:   screenHeight / 8,
+		paddingX:    2,
+		paddingY:    5,
 		selectedRow: -1,
 		selectedCol: -1,
 	}

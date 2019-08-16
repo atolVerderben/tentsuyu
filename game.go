@@ -125,6 +125,7 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 
 	if g.gameState == nil {
 		g.gameState = NewBaseGameState()
+		g.gameState.SetMsg(GameStateMsgNotStarted)
 
 	} else {
 		if err := g.GameStateLoop(); err != nil {

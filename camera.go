@@ -47,6 +47,10 @@ func CreateCamera(width, height float64) *Camera {
 	return c
 }
 
+func (c *Camera) SetClamp(clamp bool) {
+	c.clamp = clamp
+}
+
 //SetBounds that the camera operates in
 func (c *Camera) SetBounds(lowerX, upperX, lowerY, upperY float64) {
 	c.lowerBoundX = lowerX
