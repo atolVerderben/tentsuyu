@@ -78,6 +78,16 @@ func (p *AudioPlayer) MuteAll(m bool) {
 	p.muteMusic = m
 }
 
+//MuteSE sets the mute state of SoundEffects
+func (p *AudioPlayer) MuteSE(m bool) {
+	p.muteSE = m
+}
+
+//MuteMusic sets the mute state of Music
+func (p *AudioPlayer) MuteMusic(m bool) {
+	p.muteMusic = m
+}
+
 //IsSEMuted returns true if the sound effects are muted for the AudioPlayer
 func (p *AudioPlayer) IsSEMuted() bool {
 	return p.muteSE

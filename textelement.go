@@ -145,7 +145,7 @@ func (t *TextElement) drawText(text []string) error {
 	y := t.fntSize
 	for _, s := range text {
 		if t.dropShadow {
-			d2.Dot = fixed.P(+2, int(y+2))
+			d2.Dot = fixed.P(+1, int(y+1))
 			d2.DrawString(s)
 		}
 		d.Dot = fixed.P(0, int(y))

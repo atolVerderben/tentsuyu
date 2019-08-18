@@ -65,6 +65,16 @@ func (ui *UIController) AddFont(fntName string, tt *truetype.Font) {
 	ui.fonts[fntName] = tt
 }
 
+//AddFontFromBytes adds the font through a byte slice
+func (ui *UIController) AddFontFromBytes(fntName string, bytes []byte) error {
+	fnt, err := truetype.Parse(bytes)
+	if err != nil {
+		return err
+	}
+	ui.AddFont(fntName, fnt)
+	return nil
+}
+
 //AddMenu to the UIController
 func (ui *UIController) AddMenu(name string, menu *Menu) {
 	ui.menus[name] = menu
