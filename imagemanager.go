@@ -25,8 +25,13 @@ type ImageManager struct {
 	Images map[string]*ebiten.Image
 }
 
-//LoadImageFromFile loads the given image at "path" with "name"
+//LoadImageFromFile [Deprecated - use AddImageFromFile]
 func (im *ImageManager) LoadImageFromFile(name string, path string) error {
+	return im.AddImageFromFile(name, path)
+}
+
+//AddImageFromFile loads the given image at "path" with "name"
+func (im *ImageManager) AddImageFromFile(name string, path string) error {
 
 	img2, _, err := ebitenutil.NewImageFromFile(path, ebiten.FilterNearest)
 	if err != nil {

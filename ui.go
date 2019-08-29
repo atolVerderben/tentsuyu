@@ -109,6 +109,7 @@ func (ui *UIController) ActiveMenu() string {
 	return "None Active"
 }
 
+//TextElementExists returns true if the given name is found in the UIController's text elements
 func (ui *UIController) TextElementExists(name string) bool {
 	if ui.textElements[name] != nil {
 		return true
@@ -116,9 +117,12 @@ func (ui *UIController) TextElementExists(name string) bool {
 	return false
 }
 
+//HideTextElement hides the named element
 func (ui *UIController) HideTextElement(name string) {
 	ui.textElements[name].Hide()
 }
+
+//ShowTextElement shows the named element
 func (ui *UIController) ShowTextElement(name string) {
 	ui.textElements[name].Show()
 }
@@ -130,6 +134,7 @@ func (ui *UIController) WriteText(text []string, name, font string, x, y float64
 	ui.textElements[name] = t
 }
 
+//UpdateTextPosition sets the position of the named text element
 func (ui *UIController) UpdateTextPosition(name string, x, y float64) {
 	ui.textElements[name].SetPosition(x, y)
 }
@@ -220,6 +225,7 @@ func (ui *UIController) Update() {
 	}
 }
 
+//AddTextDisplay adds the passed TextElement with the given name to the UIController
 func (ui *UIController) AddTextDisplay(name string, textElement *TextElement) {
 	ui.textElements[name] = textElement
 }
@@ -278,7 +284,7 @@ func NewUINumberDisplayInt(number *int, x, y float64, w, h int, font *truetype.F
 	return nd
 }
 
-//UINumberDisplay allows a pointer to a float64 that updates and draws a TextElement on update
+//UITextDisplay shows a changable text element on the display
 type UITextDisplay struct {
 	*TextElement
 	currText *string
@@ -295,7 +301,7 @@ func (td *UITextDisplay) Update() {
 	td.TextElement.Update()
 }
 
-//NewUINumberDisplay creates a new UINumberDisplay
+//NewUITextDisplay creates a new UITExtDisplay
 func NewUITextDisplay(text *string, x, y float64, w, h int, font *truetype.Font, textColor color.Color, fntSize float64) *UITextDisplay {
 	nd := &UITextDisplay{
 		currText:    text,
@@ -316,7 +322,7 @@ func NewUINumberDisplayStationary(number *float64, x, y float64, w, h int, font 
 	return nd
 }
 
-//NewUINumberDisplayStationary creates a new UINumberDisplay
+//NewUINumberDisplayIntStationary creates a new UINumberDisplayInt
 func NewUINumberDisplayIntStationary(number *int, x, y float64, w, h int, font *truetype.Font, textColor color.Color, fntSize float64) *UINumberDisplayInt {
 	nd := &UINumberDisplayInt{
 		currNumber:  number,

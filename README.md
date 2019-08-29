@@ -15,10 +15,11 @@ that could be reusable for other games using ebiten. This is very much a work in
   * Text
   * Drawn Cursor
   * Very basic "text box"
-* Tile Map generator
+* Tile Map implementation
   * Reads JSON files from Tiled editor
+    * Currently only one format, this needs to be expanded
 * Image Manager (track 'textures')
 * GameObject interface
   * Basic Object implementation
   * Basic Image Options implementation
-* Game Struct that will bring them all together
+* Starter Game Struct

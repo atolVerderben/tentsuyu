@@ -47,6 +47,7 @@ func CreateCamera(width, height float64) *Camera {
 	return c
 }
 
+//SetClamp sets whether the camera takes the floor of its coordinates
 func (c *Camera) SetClamp(clamp bool) {
 	c.clamp = clamp
 }
@@ -68,6 +69,8 @@ func (c *Camera) SetDimensions(width, height float64) {
 //SetZoom of the camera
 func (c *Camera) SetZoom(zoom float64) {
 	c.Zoom = zoom
+	c.x, c.y = c.destX*c.Zoom, c.destY*c.Zoom
+
 }
 
 //SetZoomGradual zooms into the passed zoom value and a given speed
@@ -122,6 +125,7 @@ func (c *Camera) CenterY(y float64) {
 	c.y = y - c.Height/2
 }
 
+//GetDestination of camera (x,y)
 func (c *Camera) GetDestination() (float64, float64) {
 	return c.destX, c.destY
 }
@@ -147,6 +151,7 @@ func (c *Camera) ChangeZoom() {
 	}
 }
 
+//SetSpeed that the camera moves at
 func (c *Camera) SetSpeed(s float64) {
 	c.freeFloatSpeed = s
 }
