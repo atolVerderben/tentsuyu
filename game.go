@@ -227,3 +227,21 @@ func (g *Game) LoadAudio(gFunction GameLoadAudioFunction) {
 		g.audioLoadedCh <- audioPlayer
 	}()
 }
+
+//ScreenSize returns the width and height of the game screen
+func (g Game) ScreenSize() (w, h int) {
+	w, h = g.Screen.Size()
+	return w, h
+}
+
+//ScreenWidth returns the width of the game screen
+func (g Game) ScreenWidth() int {
+	w, _ := g.Screen.Size()
+	return w
+}
+
+//ScreenHeight returns the height of the game screen
+func (g Game) ScreenHeight() int {
+	_, h := g.Screen.Size()
+	return h
+}

@@ -81,6 +81,16 @@ func (obj BasicObject) GetHeight() int {
 	return obj.Height
 }
 
+//GetWidthF returns width as a float64
+func (obj BasicObject) GetWidthF() float64 {
+	return float64(obj.Width)
+}
+
+//GetHeightF returns height as a float64
+func (obj BasicObject) GetHeightF() float64 {
+	return float64(obj.Height)
+}
+
 //AddPosition increases X and Y position by vX and vY respectively
 func (obj *BasicObject) AddPosition(vX, vY float64) {
 	obj.X += vX
@@ -97,6 +107,8 @@ func (obj *BasicObject) SetPosition(x, y float64) {
 func (obj *BasicObject) SetSize(width, height int) {
 	obj.Width = width
 	obj.Height = height
+	obj.WidthF = float64(width)
+	obj.HeightF = float64(height)
 }
 
 //=========================================================
