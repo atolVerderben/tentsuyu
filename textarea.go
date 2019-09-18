@@ -27,13 +27,13 @@ func NewTextArea(x, y float64, w, h, lines int, font *truetype.Font, textColor c
 }
 
 //Update the TextArea. If it's selected you can type in the area
-func (ta *TextArea) Update() {
+func (ta *TextArea) Update(input *InputController) {
 	if ta.Selected {
 
-		if Input.keyManager.Get(ebiten.KeyEnter).JustPressed() || Input.keyManager.Get(ebiten.KeyKPEnter).JustPressed() {
+		if input.keyManager.Get(ebiten.KeyEnter).JustPressed() || input.keyManager.Get(ebiten.KeyKPEnter).JustPressed() {
 			ta.NewLine()
 		}
-		if Input.keyManager.Get(ebiten.KeyBackspace).JustPressed() {
+		if input.keyManager.Get(ebiten.KeyBackspace).JustPressed() {
 			if utf8.RuneCountInString(ta.text[ta.Lines-1]) > 0 {
 				ta.text[ta.Lines-1] = ta.text[ta.Lines-1][:len(ta.text[ta.Lines-1])-1]
 				ta.SetText(ta.text)

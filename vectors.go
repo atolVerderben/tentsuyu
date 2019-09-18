@@ -54,10 +54,12 @@ func (v Vector2d) Dot(other Vector2d) float64 {
 	return v.X*other.X + v.Y*other.Y
 }
 
+//Cross Product of two 2D Vectors
 func (v Vector2d) Cross(other Vector2d) float64 {
 	return v.X*other.Y - v.Y*other.X
 }
 
+//Crossf is cross of Vector and float64
 func (v Vector2d) Crossf(other float64) Vector2d {
 	return Vector2d{-v.Y * other, v.X * other}
 }
@@ -121,4 +123,9 @@ func VectorMul(v Vector2d, r float64) *Vector2d {
 //ToString nicely formats the coords in written form
 func (v Vector2d) ToString() string {
 	return fmt.Sprintf("{X:%f, Y:%f}", v.X, v.Y)
+}
+
+//Angle between two vectors
+func (v Vector2d) Angle(u Vector2d) float64 {
+	return math.Atan2(u.Y-v.Y, u.X-v.X)
 }

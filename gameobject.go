@@ -28,7 +28,9 @@ type BasicObject struct {
 	VX, VY                           float64
 	NotCentered                      bool
 	Width, Height                    int
+	WidthF, HeightF                  float64
 	ID                               xid.ID
+	isCentered                       bool
 }
 
 //SetCollision2D will allow the object to use more advanced collision functions
@@ -79,6 +81,16 @@ func (obj BasicObject) GetHeight() int {
 	return obj.Height
 }
 
+//GetWidthF returns width as a float64
+func (obj BasicObject) GetWidthF() float64 {
+	return float64(obj.Width)
+}
+
+//GetHeightF returns height as a float64
+func (obj BasicObject) GetHeightF() float64 {
+	return float64(obj.Height)
+}
+
 //AddPosition increases X and Y position by vX and vY respectively
 func (obj *BasicObject) AddPosition(vX, vY float64) {
 	obj.X += vX
@@ -95,6 +107,8 @@ func (obj *BasicObject) SetPosition(x, y float64) {
 func (obj *BasicObject) SetSize(width, height int) {
 	obj.Width = width
 	obj.Height = height
+	obj.WidthF = float64(width)
+	obj.HeightF = float64(height)
 }
 
 //=========================================================
@@ -148,11 +162,14 @@ func (obj *BasicObject) AddY(vY float64) {
 //NewBasicObject returns a new oject
 func NewBasicObject(x, y float64, w, h int) *BasicObject {
 	obj := &BasicObject{
-		ID:     xid.New(),
-		X:      x,
-		Y:      y,
-		Width:  w,
-		Height: h,
+		ID:         xid.New(),
+		X:          x,
+		Y:          y,
+		Width:      w,
+		Height:     h,
+		WidthF:     float64(w),
+		HeightF:    float64(h),
+		isCentered: true,
 	}
 
 	return obj
@@ -220,10 +237,10 @@ func (obj *BasicObject) Contains(srcX, srcY float64) bool {
 	}
 
 	xIn, yIn := false, false
-	if srcX < obj.Right() && srcX > obj.Left() {
+	if srcX <= obj.Right() && srcX >= obj.Left() {
 		xIn = true
 	}
-	if srcY < obj.Bottom() && srcY > obj.Top() {
+	if srcY <= obj.Bottom() && srcY >= obj.Top() {
 		yIn = true
 	}
 	return xIn && yIn
@@ -261,10 +278,10 @@ func (obj *BasicObject) BottomNoCenter() float64 {
 func (obj *BasicObject) ContainsNoCenter(srcX, srcY float64) bool {
 
 	xIn, yIn := false, false
-	if srcX < obj.RightNoCenter() && srcX > obj.LeftNoCenter() {
+	if srcX <= obj.RightNoCenter() && srcX >= obj.LeftNoCenter() {
 		xIn = true
 	}
-	if srcY < obj.BottomNoCenter() && srcY > obj.TopNoCenter() {
+	if srcY <= obj.BottomNoCenter() && srcY >= obj.TopNoCenter() {
 		yIn = true
 	}
 	return xIn && yIn
@@ -291,4 +308,11 @@ func (obj *BasicObject) Draw(screen *ebiten.Image) error {
 //This is useful for vector math
 func (obj BasicObject) ReturnVectorPosition() Vector2d {
 	return Vector2d{X: obj.X, Y: obj.Y}
+}
+
+//SetCentered of the object. If true the object coords refer to the center of the object.
+//If false the object coords refer to the top left of the object.
+func (obj *BasicObject) SetCentered(isCentered bool) {
+	obj.NotCentered = !isCentered
+	obj.isCentered = isCentered
 }

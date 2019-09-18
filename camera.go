@@ -25,6 +25,7 @@ type Camera struct {
 	offSetX, offSetY                                               float64
 	lowerBoundX, upperBoundX                                       float64
 	lowerBoundY, upperBoundY                                       float64
+	clamp                                                          bool
 }
 
 //CreateCamera intializes a camera struct
@@ -40,9 +41,15 @@ func CreateCamera(width, height float64) *Camera {
 		MaxZoomOut:     0.1,
 		MaxZoomIn:      2.0,
 		shakeRadius:    60.0,
-		freeFloatSpeed: 2.0,
+		freeFloatSpeed: 4.5,
+		clamp:          true,
 	}
 	return c
+}
+
+//SetClamp sets whether the camera takes the floor of its coordinates
+func (c *Camera) SetClamp(clamp bool) {
+	c.clamp = clamp
 }
 
 //SetBounds that the camera operates in
@@ -62,10 +69,14 @@ func (c *Camera) SetDimensions(width, height float64) {
 //SetZoom of the camera
 func (c *Camera) SetZoom(zoom float64) {
 	c.Zoom = zoom
+	c.x, c.y = c.destX*c.Zoom, c.destY*c.Zoom
+
 }
 
-func (c *Camera) SetZoomGradual(zoom float64) {
-
+//SetZoomGradual zooms into the passed zoom value and a given speed
+//TODO: Implement this
+func (c *Camera) SetZoomGradual(zoom, speed float64) {
+	c.SetZoom(zoom) //temporarily just call SetZoom
 }
 
 //GetOffsetX returns the camera X offset position
@@ -114,6 +125,11 @@ func (c *Camera) CenterY(y float64) {
 	c.y = y - c.Height/2
 }
 
+//GetDestination of camera (x,y)
+func (c *Camera) GetDestination() (float64, float64) {
+	return c.destX, c.destY
+}
+
 //ChangeZoom increments or decrements the camera zoom level
 func (c *Camera) ChangeZoom() {
 	if c.zoomCount > 0 {
@@ -135,27 +151,20 @@ func (c *Camera) ChangeZoom() {
 	}
 }
 
+//SetSpeed that the camera moves at
+func (c *Camera) SetSpeed(s float64) {
+	c.freeFloatSpeed = s
+}
+
 func (c *Camera) moveToDestination() {
 	//moveX, moveY := false, false
 	if c.moving {
-		if c.destX != c.x {
-			//moveX = true
-			if c.destX > c.x {
-				c.x += c.freeFloatSpeed
-			} else {
-				c.x -= c.freeFloatSpeed
-			}
-		}
-		if c.destY != c.y {
-			//moveY = true
-			if c.destY > c.y {
-				c.y += c.freeFloatSpeed
-			} else {
-				c.y -= c.freeFloatSpeed
-			}
-		}
+		angle := math.Atan2(c.destY-c.y, c.destX-c.x)
 
-		if tentsuyutils.NearCoords(c.x, c.y, c.destX, c.destY, 5) {
+		c.x += c.freeFloatSpeed * math.Cos(angle)
+		c.y += c.freeFloatSpeed * math.Sin(angle)
+
+		if tentsuyutils.Distance(c.x, c.y, c.destX, c.destY) <= 5 {
 			c.moving = false
 			c.x = c.destX
 			c.y = c.destY
@@ -268,6 +277,15 @@ func (c *Camera) DrawCameraTransformIgnoreZoom(op *ebiten.DrawImageOptions) {
 	op.GeoM.Translate(-c.x, -c.y)
 }
 
+//ApplyCameraTransform applies the camera's position to the DrawImageOptions, bool toggles whether zoom is applied or not
+func (c Camera) ApplyCameraTransform(op *ebiten.DrawImageOptions, applyZoom bool) {
+	if applyZoom {
+		c.DrawCameraTransform(op)
+	} else {
+		c.DrawCameraTransformIgnoreZoom(op)
+	}
+}
+
 //Update the camera
 func (c *Camera) Update() {
 	if c.startShaking {
@@ -292,6 +310,10 @@ func (c *Camera) Update() {
 
 	if c.moving {
 		c.moveToDestination()
+		if c.clamp {
+			c.x = math.Round(c.x)
+			c.y = math.Round(c.y)
+		}
 	}
 
 }
@@ -351,6 +373,15 @@ func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64
 	}
 }
 
+//FollowObject follows the given GameObject either within or without bounds
+func (c *Camera) FollowObject(player GameObject, bounds bool) {
+	if bounds {
+		c.FollowObjectInBounds(player)
+	} else {
+		c.FollowObjectNoBounds(player)
+	}
+}
+
 //FollowObjectInBounds follows the given GameObject within the bounds of the camera
 func (c *Camera) FollowObjectInBounds(player GameObject) {
 
@@ -382,11 +413,11 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 	if !cameraOverWidth {
 		// Follow Player Freely
 		if x-c.Width/2 > lowerWidth && x+c.Width/2 < worldWidth {
-			c.x = (x - c.Width/2)
+			c.destX = (x - c.Width/2)
 		} else if x+c.Width/2 >= worldWidth { // Stop at right edge
-			c.x = worldWidth - c.Width
+			c.destX = worldWidth - c.Width
 		} else { // Stop at left edge
-			c.x = lowerWidth
+			c.destX = lowerWidth
 		}
 	}
 
@@ -394,12 +425,41 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 	if !cameraOverHeight {
 		// Follow Player Freely
 		if y-c.Height/2 > lowerHeight && y+c.Height/2 < worldHeight {
-			c.y = y - c.Height/2
+			c.destY = y - c.Height/2
 		} else if y+c.Height/2 >= worldHeight { // Stop at bottom
-			c.y = worldHeight - c.Height
+			c.destY = worldHeight - c.Height
 		} else { // Stop at top
-			c.y = lowerHeight
+			c.destY = lowerHeight
 		}
+	}
+	if c.clamp {
+		c.x = math.Round(c.x)
+		c.y = math.Round(c.y)
+	}
+	c.moving = true
+}
+
+//FollowObjectNoBounds follows the given GameObject without boundaries
+func (c *Camera) FollowObjectNoBounds(player GameObject) {
+
+	x, y := player.GetPosition()
+	x, y = (x+c.offSetX)*c.Zoom, (y+c.offSetY)*c.Zoom
+
+	// X-Axis
+
+	// Follow Player Freely
+
+	c.x = (x - c.Width/2)
+
+	// Y-Axis
+
+	// Follow Player Freely
+
+	c.y = y - c.Height/2
+
+	if c.clamp {
+		c.x = math.Round(c.x)
+		c.y = math.Round(c.y)
 	}
 }
 
@@ -452,8 +512,4 @@ func (c *Camera) Shake() {
 		//c.x = c.preShakeX
 		//c.y = c.preShakeY
 	}
-}
-
-func (c *Camera) ShakeALittle() {
-
 }

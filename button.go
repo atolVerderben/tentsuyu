@@ -6,13 +6,15 @@ import "github.com/hajimehoshi/ebiten"
 type Button struct {
 	Triggers []ebiten.Key
 	Name     string
+	input    *InputController
 }
 
 //NewButton creates a new button
-func NewButton(name string, triggerKeys []ebiten.Key) Button {
+func NewButton(name string, triggerKeys []ebiten.Key, input *InputController) Button {
 	b := Button{
 		Triggers: triggerKeys,
 		Name:     name,
+		input:    input,
 	}
 	return b
 }
@@ -20,7 +22,7 @@ func NewButton(name string, triggerKeys []ebiten.Key) Button {
 // JustPressed checks whether an input was pressed in the previous frame.
 func (b Button) JustPressed() bool {
 	for _, trigger := range b.Triggers {
-		v := Input.keyManager.Get(trigger).JustPressed()
+		v := b.input.keyManager.Get(trigger).JustPressed()
 		if v {
 			return v
 		}
@@ -32,7 +34,7 @@ func (b Button) JustPressed() bool {
 // JustReleased checks whether an input was released in the previous frame.
 func (b Button) JustReleased() bool {
 	for _, trigger := range b.Triggers {
-		v := Input.keyManager.Get(trigger).JustReleased()
+		v := b.input.keyManager.Get(trigger).JustReleased()
 		if v {
 			return v
 		}
@@ -44,7 +46,7 @@ func (b Button) JustReleased() bool {
 // Down checks whether the current input is being held down.
 func (b Button) Down() bool {
 	for _, trigger := range b.Triggers {
-		v := Input.keyManager.Get(trigger).Down()
+		v := b.input.keyManager.Get(trigger).Down()
 		if v {
 			return v
 		}

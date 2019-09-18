@@ -22,6 +22,7 @@ type UIElement interface {
 	Size() (int, int)
 	SetSize(int, int)
 	Contains(float64, float64) bool
+	SetHighlightColor(color.Color)
 }
 
 //UIController controls all UI elements
@@ -32,10 +33,11 @@ type UIController struct {
 	fonts                     map[string]*truetype.Font
 	textElements              map[string]*TextElement
 	menus                     map[string]*Menu
+	input                     *InputController
 }
 
-//AddFont adds a new truetype font to the map
-func (ui *UIController) AddFont(fntName, fntFileLoc string) error {
+//AddFontFile adds a new truetype font from the given file location with the given name
+func (ui *UIController) AddFontFile(fntName, fntFileLoc string) error {
 
 	f, err := os.Open(fntFileLoc) //ebitenutil.OpenFile(fntFileLoc)
 	if err != nil {
@@ -58,8 +60,19 @@ func (ui *UIController) AddFont(fntName, fntFileLoc string) error {
 	return nil
 }
 
-func (ui *UIController) AddFontFile(fntName string, tt *truetype.Font) {
+//AddFont adds the given font with the given name to the ui fonts list
+func (ui *UIController) AddFont(fntName string, tt *truetype.Font) {
 	ui.fonts[fntName] = tt
+}
+
+//AddFontFromBytes adds the font through a byte slice
+func (ui *UIController) AddFontFromBytes(fntName string, bytes []byte) error {
+	fnt, err := truetype.Parse(bytes)
+	if err != nil {
+		return err
+	}
+	ui.AddFont(fntName, fnt)
+	return nil
 }
 
 //AddMenu to the UIController
@@ -85,6 +98,8 @@ func (ui *UIController) DeActivateMenu(name string) {
 
 }
 
+//ActiveMenu returns the name of the active menu.
+//Returns "None Active" if there is no active menu.
 func (ui *UIController) ActiveMenu() string {
 	for name, value := range ui.menus {
 		if value.Active {
@@ -94,6 +109,7 @@ func (ui *UIController) ActiveMenu() string {
 	return "None Active"
 }
 
+//TextElementExists returns true if the given name is found in the UIController's text elements
 func (ui *UIController) TextElementExists(name string) bool {
 	if ui.textElements[name] != nil {
 		return true
@@ -101,9 +117,12 @@ func (ui *UIController) TextElementExists(name string) bool {
 	return false
 }
 
+//HideTextElement hides the named element
 func (ui *UIController) HideTextElement(name string) {
 	ui.textElements[name].Hide()
 }
+
+//ShowTextElement shows the named element
 func (ui *UIController) ShowTextElement(name string) {
 	ui.textElements[name].Show()
 }
@@ -115,6 +134,7 @@ func (ui *UIController) WriteText(text []string, name, font string, x, y float64
 	ui.textElements[name] = t
 }
 
+//UpdateTextPosition sets the position of the named text element
 func (ui *UIController) UpdateTextPosition(name string, x, y float64) {
 	ui.textElements[name].SetPosition(x, y)
 }
@@ -125,12 +145,13 @@ func (ui *UIController) ReturnFont(name string) *truetype.Font {
 }
 
 //NewUIController creates a default UI controller
-func NewUIController() *UIController {
+func NewUIController(input *InputController) *UIController {
 	ui := &UIController{
 		DrawCursor:   true,
 		fonts:        make(map[string]*truetype.Font),
 		textElements: make(map[string]*TextElement),
 		menus:        make(map[string]*Menu),
+		input:        input,
 	}
 	return ui
 }
@@ -196,14 +217,15 @@ func (ui *UIController) Update() {
 	}
 	for i := range ui.menus {
 		if ui.menus[i].Active {
-			ui.menus[i].Update()
+			ui.menus[i].Update(ui.input, 0, 0) //TODO: I need to update this to work without offsets
 		}
 	}
 	if ui.customCursor == true {
-		ui.Cursor.Update(Input.GetMouseCoords()) //Input.Mouse.X, Input.Mouse.Y)
+		ui.Cursor.Update(ui.input.GetMouseCoords()) //Input.Mouse.X, Input.Mouse.Y)
 	}
 }
 
+//AddTextDisplay adds the passed TextElement with the given name to the UIController
 func (ui *UIController) AddTextDisplay(name string, textElement *TextElement) {
 	ui.textElements[name] = textElement
 }
@@ -235,7 +257,7 @@ func NewUINumberDisplay(number *float64, x, y float64, w, h int, font *truetype.
 	return nd
 }
 
-//UINumberDisplay allows a pointer to a float64 that updates and draws a TextElement on update
+//UINumberDisplayInt allows a pointer to an integer that updates and draws a TextElement on update
 type UINumberDisplayInt struct {
 	*TextElement
 	currNumber *int
@@ -252,7 +274,7 @@ func (nd *UINumberDisplayInt) Update() {
 	nd.TextElement.Update()
 }
 
-//NewUINumberDisplay creates a new UINumberDisplay
+//NewUINumberDisplayInt creates a new UINumberDisplayInt
 func NewUINumberDisplayInt(number *int, x, y float64, w, h int, font *truetype.Font, fntSize float64, textColor color.Color) *UINumberDisplayInt {
 	nd := &UINumberDisplayInt{
 		currNumber:  number,
@@ -262,7 +284,7 @@ func NewUINumberDisplayInt(number *int, x, y float64, w, h int, font *truetype.F
 	return nd
 }
 
-//UINumberDisplay allows a pointer to a float64 that updates and draws a TextElement on update
+//UITextDisplay shows a changable text element on the display
 type UITextDisplay struct {
 	*TextElement
 	currText *string
@@ -279,7 +301,7 @@ func (td *UITextDisplay) Update() {
 	td.TextElement.Update()
 }
 
-//NewUINumberDisplay creates a new UINumberDisplay
+//NewUITextDisplay creates a new UITExtDisplay
 func NewUITextDisplay(text *string, x, y float64, w, h int, font *truetype.Font, textColor color.Color, fntSize float64) *UITextDisplay {
 	nd := &UITextDisplay{
 		currText:    text,
@@ -300,7 +322,7 @@ func NewUINumberDisplayStationary(number *float64, x, y float64, w, h int, font 
 	return nd
 }
 
-//NewUINumberDisplayStationary creates a new UINumberDisplay
+//NewUINumberDisplayIntStationary creates a new UINumberDisplayInt
 func NewUINumberDisplayIntStationary(number *int, x, y float64, w, h int, font *truetype.Font, textColor color.Color, fntSize float64) *UINumberDisplayInt {
 	nd := &UINumberDisplayInt{
 		currNumber:  number,

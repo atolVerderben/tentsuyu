@@ -51,6 +51,12 @@ func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWid
 
 	for height := 0 + paddingHeight; height <= imageHeight; height += paddingHeight + frameHeight {
 		for width := 0 + paddingWidth; width <= imageWidth; width += paddingWidth + frameWidth {
+			if width >= imageWidth {
+				continue
+			}
+			if height >= imageHeight {
+				continue
+			}
 			frame := map[string]int{}
 			frame["x"] = width
 			frame["y"] = height

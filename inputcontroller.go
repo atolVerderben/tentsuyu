@@ -57,29 +57,29 @@ func (ic *InputController) GetMouseCoords() (float64, float64) {
 }
 
 //GetGameMouseCoords returns the game coords based on the camera position and zoom
-func (ic *InputController) GetGameMouseCoords() (x, y float64) {
+func (ic *InputController) GetGameMouseCoords(camera *Camera) (x, y float64) {
 	mx, my := ebiten.CursorPosition()
-	x, y = (float64(mx)+(Components.Camera.GetX()))/(Components.Camera.Zoom), (float64(my)+(Components.Camera.GetY()))/(Components.Camera.Zoom)
+	x, y = (float64(mx)+(camera.GetX()))/(camera.Zoom), (float64(my)+(camera.GetY()))/(camera.Zoom)
 	return x, y
 }
 
 //GetGameMouseCoordsNoZoom is the same as GetGameMouseCoords but ignores the camera's zoom level (useful for drawing the cursor)
-func (ic *InputController) GetGameMouseCoordsNoZoom() (x, y float64) {
+func (ic *InputController) GetGameMouseCoordsNoZoom(camera *Camera) (x, y float64) {
 	mx, my := ebiten.CursorPosition()
-	x, y = (float64(mx) + (Components.Camera.GetX())), (float64(my) + (Components.Camera.GetY()))
+	x, y = (float64(mx) + (camera.GetX())), (float64(my) + (camera.GetY()))
 	return x, y
 }
 
 //Update InputController
 func (ic *InputController) Update() {
 	ic.keyManager.update()
-	ic.Mouse.update()
+	ic.Mouse.update(ic)
 
 }
 
 // RegisterButton registers a new button input.
 func (ic *InputController) RegisterButton(name string, triggerKeys ...ebiten.Key) {
-	ic.buttons[name] = NewButton(name, triggerKeys)
+	ic.buttons[name] = NewButton(name, triggerKeys, ic)
 	for i := range triggerKeys {
 		ic.keyManager.AddKey(triggerKeys[i])
 	}
@@ -90,6 +90,7 @@ func (ic *InputController) RegisterMouseButton(name string, buttons ...ebiten.Mo
 	ic.mouseButtons[name] = MouseButton{
 		Name:     name,
 		Triggers: buttons,
+		input:    ic,
 	}
 }
 

@@ -14,14 +14,15 @@ import (
 
 //TextElement contains the font, text, and position of that current text element
 type TextElement struct {
-	font                 *truetype.Font
-	Name                 string
-	drawImage            *ebiten.Image
-	fntSize, fntDpi      float64
-	text, prevText       []string
-	visible              bool
-	Stationary           bool
-	textColor, origColor color.Color
+	dropShadow                           bool
+	font                                 *truetype.Font
+	Name                                 string
+	drawImage                            *ebiten.Image
+	fntSize, fntDpi                      float64
+	text, prevText                       []string
+	visible                              bool
+	Stationary                           bool
+	textColor, origColor, highlightColor color.Color
 	*BasicUIElement
 }
 
@@ -42,6 +43,8 @@ func NewTextElement(x, y float64, w, h int, font *truetype.Font, text []string, 
 		textColor:      textColor,
 		origColor:      textColor,
 		visible:        true,
+		highlightColor: color.RGBA{153, 153, 0, 255},
+		dropShadow:     true,
 	}
 	t.drawText(t.text)
 	return t
@@ -65,9 +68,21 @@ func NewTextElementStationary(x, y float64, w, h int, font *truetype.Font, text 
 		origColor:      textColor,
 		visible:        true,
 		Stationary:     true,
+		highlightColor: color.RGBA{153, 153, 0, 255},
 	}
 	t.drawText(t.text)
 	return t
+}
+
+//SetHighlightColor sets the color of the text element when it's highlighted
+func (t *TextElement) SetHighlightColor(c color.Color) {
+	t.highlightColor = c
+}
+
+//SetTextColor sets the color of the text element
+func (t *TextElement) SetTextColor(c color.Color) {
+	t.textColor = c
+	t.origColor = c
 }
 
 //Hide the TextElement
@@ -80,13 +95,15 @@ func (t *TextElement) Show() {
 	t.visible = true
 }
 
+//Highlighted sets the TextElement to its highlighted color
 func (t *TextElement) Highlighted() bool {
-	t.textColor = color.RGBA{153, 153, 0, 255}
+	t.textColor = t.highlightColor
 	t.drawText(t.text)
 
 	return true
 }
 
+//UnHighlighted returns the TextElement to its original color
 func (t *TextElement) UnHighlighted() bool {
 	t.textColor = t.origColor
 	t.drawText(t.text)
@@ -94,6 +111,7 @@ func (t *TextElement) UnHighlighted() bool {
 	return true
 }
 
+//SetFontSize of the TextElement
 func (t *TextElement) SetFontSize(fntSize float64) {
 	t.fntSize = fntSize
 }
@@ -126,8 +144,8 @@ func (t *TextElement) drawText(text []string) error {
 	}
 	y := t.fntSize
 	for _, s := range text {
-		if t.fntSize > 16 {
-			d2.Dot = fixed.P(+2, int(y+2))
+		if t.dropShadow {
+			d2.Dot = fixed.P(+1, int(y+1))
 			d2.DrawString(s)
 		}
 		d.Dot = fixed.P(0, int(y))
@@ -137,6 +155,11 @@ func (t *TextElement) drawText(text []string) error {
 
 	return t.drawImage.ReplacePixels(dst.Pix)
 
+}
+
+//SetDropShadow of the TextElement. If true then a second outline will be drawn.
+func (t *TextElement) SetDropShadow(drop bool) {
+	t.dropShadow = drop
 }
 
 //Update TextElement
@@ -166,6 +189,7 @@ func (t *TextElement) ReturnText() string {
 	return t.text[0]
 }
 
+//SetPosition of TextElement to given x,y coords
 func (t *TextElement) SetPosition(x, y float64) {
 	t.X = x
 	t.Y = y
@@ -180,7 +204,7 @@ func (t *TextElement) Draw(screen *ebiten.Image) error {
 	op.GeoM.Translate(t.GetPosition())
 	//GameCamera.DrawCameraTransform(op)
 	if !t.Stationary {
-		ApplyCameraTransform(op, false)
+		//ApplyCameraTransform(op, false)
 	}
 	if err := screen.DrawImage(t.drawImage, op); err != nil {
 		return err
@@ -197,7 +221,7 @@ func (t *TextElement) DrawApplyZoom(screen *ebiten.Image) error {
 	op.GeoM.Translate(t.GetPosition())
 	//GameCamera.DrawCameraTransform(op)
 	if !t.Stationary {
-		ApplyCameraTransform(op, true)
+		//ApplyCameraTransform(op, true)
 	}
 	if err := screen.DrawImage(t.drawImage, op); err != nil {
 		return err

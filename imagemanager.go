@@ -4,28 +4,36 @@ import (
 	"bytes"
 	"image"
 
+	"github.com/hajimehoshi/ebiten/ebitenutil"
+
 	//I want to accept png and jpg files by default
 	_ "image/jpeg"
 	_ "image/png"
-	"os"
 
 	"github.com/hajimehoshi/ebiten"
 )
 
-type imageManager struct {
+//NewImageManager creates a new pointer to ImageManager
+func NewImageManager() *ImageManager {
+	return &ImageManager{
+		Images: map[string]*ebiten.Image{},
+	}
+}
+
+//ImageManager is a struct containing a map of named ebiten.Images
+type ImageManager struct {
 	Images map[string]*ebiten.Image
 }
 
-func (im *imageManager) LoadImageFromFile(name string, path string) error {
+//LoadImageFromFile [Deprecated - use AddImageFromFile]
+func (im *ImageManager) LoadImageFromFile(name string, path string) error {
+	return im.AddImageFromFile(name, path)
+}
 
-	fImg1, _ := os.Open(path)
-	defer fImg1.Close()
-	img, _, err := image.Decode(fImg1)
-	if err != nil {
-		return err
-	}
+//AddImageFromFile loads the given image at "path" with "name"
+func (im *ImageManager) AddImageFromFile(name string, path string) error {
 
-	img2, err := ebiten.NewImageFromImage(img, ebiten.FilterNearest)
+	img2, _, err := ebitenutil.NewImageFromFile(path, ebiten.FilterNearest)
 	if err != nil {
 		return err
 	}
@@ -35,18 +43,18 @@ func (im *imageManager) LoadImageFromFile(name string, path string) error {
 }
 
 //AddImage adds an ebiten.Image to the map with a given name
-func (im *imageManager) AddImage(name string, image *ebiten.Image) {
+func (im *ImageManager) AddImage(name string, image *ebiten.Image) {
 	im.Images[name] = image
 }
 
 //ReturnImage retrieves the specified image name
-func (im *imageManager) ReturnImage(name string) *ebiten.Image {
+func (im *ImageManager) ReturnImage(name string) *ebiten.Image {
 	return im.Images[name]
 }
 
 //AddImageFromBytes adds in the image based on a byte slice
 //Very helpful with using file2byteslice by HajimeHoshi
-func (im *imageManager) AddImageFromBytes(name string, b []byte) error {
+func (im *ImageManager) AddImageFromBytes(name string, b []byte) error {
 	img, _, err := image.Decode(bytes.NewReader(b))
 	if err != nil {
 		return err

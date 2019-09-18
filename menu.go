@@ -16,12 +16,12 @@ type Menu struct {
 }
 
 //NewMenu creates a new menu
-func NewMenu() *Menu {
+func NewMenu(screenWidth, screenHeight float64) *Menu {
 	m := &Menu{
-		midStartX:   Components.ScreenWidth / 2,
-		midStartY:   Components.ScreenHeight / 4,
-		paddingX:    10,
-		paddingY:    20,
+		midStartX:   screenWidth / 2,
+		midStartY:   screenHeight / 8,
+		paddingX:    2,
+		paddingY:    5,
 		selectedRow: -1,
 		selectedCol: -1,
 	}
@@ -67,7 +67,7 @@ func (m *Menu) PressSelected() {
 }
 
 //Update the menu
-func (m *Menu) Update() {
+func (m *Menu) Update(input *InputController, offsetX, offsetY float64) {
 	//log.Printf("%v,%v\n", m.maxWidth, m.maxHeight)
 	//m.x = Components.Camera.GetX()
 	//m.y = Components.Camera.GetY()
@@ -89,7 +89,7 @@ func (m *Menu) Update() {
 			}
 
 			//m.elements[x][y].UIElement.SetPosition(mx, my)
-			if m.Elements[x][y].Update() {
+			if m.Elements[x][y].Update(input, offsetX, offsetY) {
 				m.selectedCol = -1
 				m.selectedRow = -1
 			}
@@ -122,7 +122,9 @@ func (m *Menu) Draw(screen *ebiten.Image) {
 	}
 	for x := range m.Elements {
 		for y := range m.Elements[x] {
-			m.Elements[x][y].UIElement.Draw(screen)
+			if !m.Elements[x][y].hidden {
+				m.Elements[x][y].UIElement.Draw(screen)
+			}
 		}
 	}
 }
@@ -199,6 +201,7 @@ type MenuElement struct {
 	Action                  func()
 	highlighted, Selectable bool
 	menuX, menuY            float64
+	hidden                  bool
 }
 
 //SetAction of the MenuElement
@@ -212,14 +215,17 @@ func (m *MenuElement) SetAction(function func()) {
 }
 
 //Update the MenuElement
-func (m *MenuElement) Update() bool {
+func (m *MenuElement) Update(input *InputController, offsetX, offsetY float64) bool {
+	if m.hidden {
+		return false
+	}
 	mouseHighlight := false
-	if m.UIElement.Contains(Input.Mouse.X, Input.Mouse.Y) {
+	if m.UIElement.Contains(input.Mouse.X+offsetX, input.Mouse.Y+offsetY) {
 		if m.Selectable {
 			mouseHighlight = true
 			m.Highlighted()
 			m.highlighted = true
-			if Input.LeftClick().JustPressed() {
+			if input.LeftClick().JustPressed() {
 
 				if m.Action != nil {
 					m.Action()
@@ -235,4 +241,9 @@ func (m *MenuElement) Update() bool {
 
 	m.UIElement.Update()
 	return mouseHighlight
+}
+
+//Hide takes a bool and sets the hidden variable
+func (m *MenuElement) Hide(h bool) {
+	m.hidden = h
 }

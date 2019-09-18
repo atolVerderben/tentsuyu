@@ -62,8 +62,8 @@ func (m *Mouse) IsScrollUp() bool {
 	return false
 }
 
-func (m *Mouse) update() {
-	m.X, m.Y = Input.GetMouseCoords() //m.GetGameMouseCoordsNoZoom()
+func (m *Mouse) update(input *InputController) {
+	m.X, m.Y = input.GetMouseCoords() //m.GetGameMouseCoordsNoZoom()
 	m.mouseWheelMoving = false
 	wX, wY := ebiten.Wheel()
 	if wX != 0 || wY != 0 {
@@ -102,9 +102,9 @@ func (m *Mouse) update() {
 }
 
 //GetGameMouseCoordsNoZoom is the same as GetGameMouseCoords but ignores the camera's zoom level (useful for drawing the cursor)
-func (m *Mouse) GetGameMouseCoordsNoZoom() (x, y float64) {
+func (m *Mouse) GetGameMouseCoordsNoZoom(camera *Camera) (x, y float64) {
 	mx, my := ebiten.CursorPosition()
-	x, y = (float64(mx) + (Components.Camera.GetX())), (float64(my) + (Components.Camera.GetY()))
+	x, y = (float64(mx) + (camera.GetX())), (float64(my) + (camera.GetY()))
 	return x, y
 }
 
