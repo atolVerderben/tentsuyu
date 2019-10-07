@@ -96,8 +96,8 @@ func (a *Animation) ReturnImageParts() *BasicImageParts {
 	return a.ImageParts
 }
 
-//SetAnimationSpeed of the current animation
-func (a *Animation) SetAnimationSpeed(speed int) {
+//SetFrameSpeed of the current animation
+func (a *Animation) SetFrameSpeed(speed int) {
 	a.frameSpeed = speed
 }
 

@@ -31,6 +31,8 @@ type BasicObject struct {
 	WidthF, HeightF                  float64
 	ID                               xid.ID
 	isCentered                       bool
+	Velocity                         *Vector2d
+	Position                         *Vector2d
 }
 
 //SetCollision2D will allow the object to use more advanced collision functions
@@ -63,12 +65,12 @@ func (obj BasicObject) GetPosition() (float64, float64) {
 
 //GetY returns the y coords
 func (obj BasicObject) GetY() float64 {
-	return obj.Y
+	return obj.Position.Y
 }
 
 //GetX returns the x coords
 func (obj BasicObject) GetX() float64 {
-	return obj.X
+	return obj.Position.X
 }
 
 //GetWidth returns width
@@ -101,6 +103,8 @@ func (obj *BasicObject) AddPosition(vX, vY float64) {
 func (obj *BasicObject) SetPosition(x, y float64) {
 	obj.X = x
 	obj.Y = y
+	obj.Position.X = x
+	obj.Position.Y = y
 }
 
 //SetSize with width , height
@@ -116,11 +120,13 @@ func (obj *BasicObject) SetSize(width, height int) {
 //SetX of the position
 func (obj *BasicObject) SetX(x float64) {
 	obj.X = x
+	obj.Position.X = x
 }
 
 //SetY of the position
 func (obj *BasicObject) SetY(y float64) {
 	obj.Y = y
+	obj.Position.Y = y
 }
 
 //GetAngle  of BasicObject
@@ -152,11 +158,13 @@ func (obj BasicObject) GetSize() (int, int) {
 //AddX adds to the x value
 func (obj *BasicObject) AddX(vX float64) {
 	obj.X += vX
+	obj.Position.X += vX
 }
 
 //AddY adds to the y value
 func (obj *BasicObject) AddY(vY float64) {
-	obj.X += vY
+	obj.Y += vY
+	obj.Position.Y += vY
 }
 
 //NewBasicObject returns a new oject
@@ -170,6 +178,8 @@ func NewBasicObject(x, y float64, w, h int) *BasicObject {
 		WidthF:     float64(w),
 		HeightF:    float64(h),
 		isCentered: true,
+		Velocity:   &Vector2d{},
+		Position:   &Vector2d{X: x, Y: y},
 	}
 
 	return obj

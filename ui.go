@@ -342,12 +342,7 @@ type BasicUIElement struct {
 
 //NewBasicUIElement  creates a BasicUIElement
 func NewBasicUIElement(x, y float64, w, h int) *BasicUIElement {
-	obj := &BasicObject{
-		X:      x,
-		Y:      y,
-		Width:  w,
-		Height: h,
-	}
+	obj := NewBasicObject(x,y,w,h)
 	u := &BasicUIElement{
 		BasicObject: obj,
 	}
