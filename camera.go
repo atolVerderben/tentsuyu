@@ -318,6 +318,11 @@ func (c *Camera) Update() {
 
 }
 
+//GetScreenCoords returns where the passed coords would be on the screen space
+func (c Camera) GetScreenCoords(x, y float64) (float64, float64) {
+	return x*c.Zoom - c.x, y*c.Zoom - c.y
+}
+
 //FollowPlayer follows the specified character (in this case the player)
 func (c *Camera) FollowPlayer(player GameObject, worldWidth, worldHeight float64) {
 

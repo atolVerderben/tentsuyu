@@ -60,7 +60,7 @@ func (obj *BasicObject) GetVelocity() (float64, float64) {
 
 //GetPosition returns the x,y coords
 func (obj BasicObject) GetPosition() (float64, float64) {
-	return obj.X, obj.Y
+	return obj.Position.X, obj.Position.Y
 }
 
 //GetY returns the y coords
