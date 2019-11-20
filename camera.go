@@ -468,13 +468,9 @@ func (c *Camera) FollowObjectNoBounds(player GameObject) {
 	}
 }
 
-//StartShaking begins the camera shake
-func (c *Camera) StartShaking(severe bool) {
-	if severe {
-		c.shakeRadius = 15.0
-	} else {
-		c.shakeRadius = 10.0
-	}
+//StartShaking begins the camera shake with the passed intensity
+func (c *Camera) StartShaking(r float64) {
+	c.shakeRadius = r
 	c.startShaking = true
 
 }
