@@ -159,12 +159,6 @@ func NewUIController(input *InputController) *UIController {
 //SetCustomCursor allows the addition of a cursor image
 func (ui *UIController) SetCustomCursor(width, height, sx, sy int, spritesheet *ebiten.Image) {
 	c := &Cursor{
-		BasicObject: &BasicObject{
-			X:      ui.screenWidth / 2,
-			Y:      ui.screenHeight / 2,
-			Width:  width,
-			Height: height,
-		},
 		BasicImageParts: &BasicImageParts{
 			Sx:     sx,
 			Sy:     sy,
@@ -174,6 +168,7 @@ func (ui *UIController) SetCustomCursor(width, height, sx, sy int, spritesheet *
 		style:       CursorCrosshair,
 		spritesheet: spritesheet,
 	}
+	c.BasicObject = NewBasicObject(ui.screenWidth/2, ui.screenHeight/2, width, height)
 	ui.DrawCursor = true
 	ui.customCursor = true
 	ui.Cursor = c
@@ -342,7 +337,7 @@ type BasicUIElement struct {
 
 //NewBasicUIElement  creates a BasicUIElement
 func NewBasicUIElement(x, y float64, w, h int) *BasicUIElement {
-	obj := NewBasicObject(x,y,w,h)
+	obj := NewBasicObject(x, y, w, h)
 	u := &BasicUIElement{
 		BasicObject: obj,
 	}
@@ -357,12 +352,6 @@ func (u *BasicUIElement) Highlighted() bool {
 //UnHighlighted returns if the element is Highlighted
 func (u *BasicUIElement) UnHighlighted() bool {
 	return u.isHighlited
-}
-
-//AddPosition adds the specified values to the x and y position
-func (u *BasicUIElement) AddPosition(x, y float64) {
-	u.X += x
-	u.Y += y
 }
 
 //Size returns the elements size

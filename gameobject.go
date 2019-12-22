@@ -24,15 +24,15 @@ type GameObject interface {
 
 //BasicObject is the bare implementation of a GameObject
 type BasicObject struct {
-	X, Y, Angle, Speed, PrevX, PrevY float64
-	VX, VY                           float64
-	NotCentered                      bool
-	Width, Height                    int
-	WidthF, HeightF                  float64
-	ID                               xid.ID
-	isCentered                       bool
-	Velocity                         *Vector2d
-	Position                         *Vector2d
+	Angle, Speed, PrevX, PrevY float64
+	VX, VY                     float64
+	NotCentered                bool
+	Width, Height              int
+	WidthF, HeightF            float64
+	ID                         xid.ID
+	isCentered                 bool
+	Velocity                   *Vector2d
+	Position                   *Vector2d
 }
 
 //SetCollision2D will allow the object to use more advanced collision functions
@@ -95,14 +95,12 @@ func (obj BasicObject) GetHeightF() float64 {
 
 //AddPosition increases X and Y position by vX and vY respectively
 func (obj *BasicObject) AddPosition(vX, vY float64) {
-	obj.X += vX
-	obj.Y += vY
+	obj.Position.X += vX
+	obj.Position.Y += vY
 }
 
 //SetPosition of x,y
 func (obj *BasicObject) SetPosition(x, y float64) {
-	obj.X = x
-	obj.Y = y
 	obj.Position.X = x
 	obj.Position.Y = y
 }
@@ -119,13 +117,11 @@ func (obj *BasicObject) SetSize(width, height int) {
 
 //SetX of the position
 func (obj *BasicObject) SetX(x float64) {
-	obj.X = x
 	obj.Position.X = x
 }
 
 //SetY of the position
 func (obj *BasicObject) SetY(y float64) {
-	obj.Y = y
 	obj.Position.Y = y
 }
 
@@ -157,13 +153,11 @@ func (obj BasicObject) GetSize() (int, int) {
 
 //AddX adds to the x value
 func (obj *BasicObject) AddX(vX float64) {
-	obj.X += vX
 	obj.Position.X += vX
 }
 
 //AddY adds to the y value
 func (obj *BasicObject) AddY(vY float64) {
-	obj.Y += vY
 	obj.Position.Y += vY
 }
 
@@ -171,8 +165,6 @@ func (obj *BasicObject) AddY(vY float64) {
 func NewBasicObject(x, y float64, w, h int) *BasicObject {
 	obj := &BasicObject{
 		ID:         xid.New(),
-		X:          x,
-		Y:          y,
 		Width:      w,
 		Height:     h,
 		WidthF:     float64(w),
@@ -317,7 +309,7 @@ func (obj *BasicObject) Draw(screen *ebiten.Image) error {
 //ReturnVectorPosition returns the X,Y position as a vector2d
 //This is useful for vector math
 func (obj BasicObject) ReturnVectorPosition() Vector2d {
-	return Vector2d{X: obj.X, Y: obj.Y}
+	return Vector2d{X: obj.Position.X, Y: obj.Position.Y}
 }
 
 //SetCentered of the object. If true the object coords refer to the center of the object.

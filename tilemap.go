@@ -249,7 +249,7 @@ func (t *Tile) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	op.ImageParts = t.BasicImageParts
 	//op.GeoM.Translate(float64(-t.BasicObject.Width/2), float64(-t.BasicObject.Height/2))
 	//op.GeoM.Scale(float64(scalex), float64(scaley))
-	op.GeoM.Translate(t.X, t.Y)
+	op.GeoM.Translate(t.Position.X, t.Position.Y)
 
 	//log.Printf("%v,%v\n", scalex, scaley)
 	//ApplyCameraTransform(op, true)
