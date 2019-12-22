@@ -19,12 +19,6 @@ const (
 //NewCursor creates the cursor... should be called during game set up
 func NewCursor(screenWidth, screenHeight float64, spritesheet *ebiten.Image) *Cursor {
 	c := &Cursor{
-		BasicObject: &BasicObject{
-			X:      screenWidth / 2,
-			Y:      screenHeight / 2,
-			Width:  32,
-			Height: 32,
-		},
 		BasicImageParts: &BasicImageParts{
 			Sx:     332,
 			Sy:     468,
@@ -34,6 +28,7 @@ func NewCursor(screenWidth, screenHeight float64, spritesheet *ebiten.Image) *Cu
 		style:       CursorCrosshair,
 		spritesheet: spritesheet,
 	}
+	c.BasicObject = NewBasicObject(screenWidth/2, screenHeight/2, 32, 32)
 	return c
 }
 

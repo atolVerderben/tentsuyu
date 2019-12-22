@@ -189,12 +189,6 @@ func (t *TextElement) ReturnText() string {
 	return t.text[0]
 }
 
-//SetPosition of TextElement to given x,y coords
-func (t *TextElement) SetPosition(x, y float64) {
-	t.X = x
-	t.Y = y
-}
-
 //Draw the TextElement
 func (t *TextElement) Draw(screen *ebiten.Image) error {
 	if t.visible == false {
