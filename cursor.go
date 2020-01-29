@@ -20,8 +20,10 @@ const (
 func NewCursor(screenWidth, screenHeight float64, spritesheet *ebiten.Image) *Cursor {
 	c := &Cursor{
 		BasicObject: &BasicObject{
-			X:      screenWidth / 2,
-			Y:      screenHeight / 2,
+			Position: &Vector2d{
+				X: screenWidth / 2,
+				Y: screenHeight / 2,
+			},
 			Width:  32,
 			Height: 32,
 		},

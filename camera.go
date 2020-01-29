@@ -437,6 +437,8 @@ func (c *Camera) FollowObjectInBounds(player GameObject) {
 			c.destY = lowerHeight
 		}
 	}
+	c.x = c.destX
+	c.y = c.destY
 	if c.clamp {
 		c.x = math.Round(c.x)
 		c.y = math.Round(c.y)

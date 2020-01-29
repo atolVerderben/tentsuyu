@@ -88,3 +88,14 @@ func (b *BasicImageParts) SetScale(op *ebiten.DrawImageOptions) {
 	}
 	op.GeoM.Scale(float64(b.DestWidth/b.Width), float64(b.DestHeight/b.Height))
 }
+
+//BasicImagePartsFromSpriteSheet creates a BasicImageParts from a passed spritesheet on the passed frame.
+//This is helpful to easily get the correct sx,sy,w,h without manually typing it in every time.
+func BasicImagePartsFromSpriteSheet(spriteSheet *SpriteSheet, frame int) *BasicImageParts {
+	return &BasicImageParts{
+		Sx:     spriteSheet.Frames[frame].Frame["x"],
+		Sy:     spriteSheet.Frames[frame].Frame["y"],
+		Width:  spriteSheet.Frames[frame].Frame["w"],
+		Height: spriteSheet.Frames[frame].Frame["h"],
+	}
+}

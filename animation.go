@@ -31,6 +31,11 @@ func NewAnimation(spriteSheet *SpriteSheet, frames []int, speed int) *Animation 
 	return a
 }
 
+//SetAnimationSpeed changes the speed of the animation to the passed value
+func (a *Animation) SetAnimationSpeed(s int) {
+	a.frameSpeed = s
+}
+
 //SetReverse tells the animation to play in reverse
 func (a *Animation) SetReverse() {
 	a.reverse = true

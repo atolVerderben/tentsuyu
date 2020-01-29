@@ -71,3 +71,16 @@ func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWid
 
 	return s
 }
+
+//ReturnImageParts returns the BasicImageParts at the given frame of the animation.
+func (s SpriteSheet) ReturnImageParts(f int) *BasicImageParts {
+	i := &BasicImageParts{
+		Sx:     s.Frames[f].Frame["x"],
+		Sy:     s.Frames[f].Frame["y"],
+		Width:  s.Frames[f].Frame["w"],
+		Height: s.Frames[f].Frame["h"],
+	}
+
+	return i
+
+}

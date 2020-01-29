@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"image"
 
-	"github.com/hajimehoshi/ebiten/ebitenutil"
-
 	//I want to accept png and jpg files by default
 	_ "image/jpeg"
 	_ "image/png"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 //NewImageManager creates a new pointer to ImageManager

@@ -37,6 +37,7 @@ type Layer struct {
 	Properties []*Property  `json:"properties"`
 	DrawOrder  string       `json:"draworder"`
 	Objects    []*MapObject `json:"objects"`
+	//Encoding   string       `json:"encoding"`
 	//	ImageName  string               `json:"image"`
 }
 
@@ -182,6 +183,7 @@ func CreateTileMap(tilemap *Map) *TileMap {
 			}*/
 			rowRange := 0
 			//rowTiles := []*Tile{}
+
 			x := 0.0
 			y := 0.0
 			for _, tileData := range layer.Data {
@@ -249,7 +251,7 @@ func (t *Tile) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	op.ImageParts = t.BasicImageParts
 	//op.GeoM.Translate(float64(-t.BasicObject.Width/2), float64(-t.BasicObject.Height/2))
 	//op.GeoM.Scale(float64(scalex), float64(scaley))
-	op.GeoM.Translate(t.X, t.Y)
+	op.GeoM.Translate(t.GetX(), t.GetY())
 
 	//log.Printf("%v,%v\n", scalex, scaley)
 	//ApplyCameraTransform(op, true)

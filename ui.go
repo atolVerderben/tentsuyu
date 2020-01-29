@@ -160,8 +160,11 @@ func NewUIController(input *InputController) *UIController {
 func (ui *UIController) SetCustomCursor(width, height, sx, sy int, spritesheet *ebiten.Image) {
 	c := &Cursor{
 		BasicObject: &BasicObject{
-			X:      ui.screenWidth / 2,
-			Y:      ui.screenHeight / 2,
+			Position: &Vector2d{
+				X: ui.screenWidth / 2,
+				Y: ui.screenHeight / 2,
+			},
+
 			Width:  width,
 			Height: height,
 		},
@@ -342,7 +345,7 @@ type BasicUIElement struct {
 
 //NewBasicUIElement  creates a BasicUIElement
 func NewBasicUIElement(x, y float64, w, h int) *BasicUIElement {
-	obj := NewBasicObject(x,y,w,h)
+	obj := NewBasicObject(x, y, w, h)
 	u := &BasicUIElement{
 		BasicObject: obj,
 	}
@@ -361,8 +364,8 @@ func (u *BasicUIElement) UnHighlighted() bool {
 
 //AddPosition adds the specified values to the x and y position
 func (u *BasicUIElement) AddPosition(x, y float64) {
-	u.X += x
-	u.Y += y
+	u.Position.X += x
+	u.Position.Y += y
 }
 
 //Size returns the elements size

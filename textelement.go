@@ -129,10 +129,10 @@ func (t *TextElement) drawText(text []string) error {
 			//Hinting: font.HintingFull,
 		}),
 	}
-	highlight := color.White
-	if t.textColor != color.Black {
+	highlight := color.Black
+	/*if t.textColor != color.Black {
 		highlight = color.Black
-	}
+	}*/
 	d2 := &font.Drawer{
 		Dst: dst,
 		Src: image.NewUniform(highlight),
@@ -145,7 +145,7 @@ func (t *TextElement) drawText(text []string) error {
 	y := t.fntSize
 	for _, s := range text {
 		if t.dropShadow {
-			d2.Dot = fixed.P(+1, int(y+1))
+			d2.Dot = fixed.P(+2, int(y+2))
 			d2.DrawString(s)
 		}
 		d.Dot = fixed.P(0, int(y))
@@ -191,8 +191,8 @@ func (t *TextElement) ReturnText() string {
 
 //SetPosition of TextElement to given x,y coords
 func (t *TextElement) SetPosition(x, y float64) {
-	t.X = x
-	t.Y = y
+	t.Position.X = x
+	t.Position.Y = y
 }
 
 //Draw the TextElement
@@ -205,6 +205,23 @@ func (t *TextElement) Draw(screen *ebiten.Image) error {
 	//GameCamera.DrawCameraTransform(op)
 	if !t.Stationary {
 		//ApplyCameraTransform(op, false)
+	}
+	if err := screen.DrawImage(t.drawImage, op); err != nil {
+		return err
+	}
+	return nil
+}
+
+//DrawPosition applies the camera transform to the text element
+func (t *TextElement) DrawPosition(screen *ebiten.Image, camera *Camera) error {
+	if t.visible == false {
+		return nil
+	}
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(t.GetPosition())
+	//GameCamera.DrawCameraTransform(op)
+	if !t.Stationary {
+		camera.ApplyCameraTransform(op, true)
 	}
 	if err := screen.DrawImage(t.drawImage, op); err != nil {
 		return err
