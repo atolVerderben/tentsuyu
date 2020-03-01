@@ -55,3 +55,27 @@ func RadianToDegree(radian float64) float64 {
 func AngleBetween(x1, y1, x2, y2 float64) float64 {
 	return math.Atan2(y2-y1, x2-x1)
 }
+
+//MakeRangeInt of ints between min and max values
+func MakeRangeInt(min, max int) []int {
+	a := make([]int, max-min+1)
+	for i := range a {
+		a[i] = min + i
+	}
+	return a
+}
+
+//WhatQuadrant returns an int representing the quadrant of a circle the angle is in
+func WhatQuadrant(angle float64) int {
+
+	if math.Sin(angle) > 0 && math.Cos(angle) > 0 {
+		return 1
+	} else if math.Sin(angle) > 0 && math.Cos(angle) < 0 {
+		return 2
+	} else if math.Sin(angle) < 0 && math.Cos(angle) < 0 {
+		return 3
+	} else if math.Sin(angle) < 0 && math.Cos(angle) > 0 {
+		return 4
+	}
+	return -1
+}

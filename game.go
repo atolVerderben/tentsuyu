@@ -53,6 +53,9 @@ func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	}
 	game.UIController = NewUIController(game.Input)
 	game.AudioPlayer, err = NewAudioPlayer()
+	game.gameState = NewBaseGameState()
+	game.gameState.SetMsg(GameStateMsgNotStarted)
+
 	game.SetGameDrawLoop(func(screen *ebiten.Image) error {
 
 		return nil
@@ -66,7 +69,7 @@ func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	//All inputs can be overriden
 	//=====================================
 
-	//Basic Default Inputs
+	//Basic Default Inputs - Can be overwritten
 	game.Input.RegisterButton("Up", ebiten.KeyW, ebiten.KeyUp)
 	game.Input.RegisterButton("Down", ebiten.KeyS, ebiten.KeyDown)
 	game.Input.RegisterButton("Left", ebiten.KeyA, ebiten.KeyLeft)
@@ -123,14 +126,8 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 	g.Input.Update()
 	g.Screen = screen
 
-	if g.gameState == nil {
-		g.gameState = NewBaseGameState()
-		g.gameState.SetMsg(GameStateMsgNotStarted)
-
-	} else {
-		if err := g.GameStateLoop(); err != nil {
-			return err
-		}
+	if err := g.GameStateLoop(); err != nil {
+		return err
 	}
 
 	if err := g.gameState.Update(g); err != nil {
@@ -141,7 +138,7 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 	if g.Input.Button("ToggleFullscreen").JustPressed() {
 		g.ToggleFullscreen()
 	}
-	if !ebiten.IsRunningSlowly() {
+	if !ebiten.IsDrawingSkipped() {
 		if err := g.gameState.Draw(g); err != nil {
 			return err
 		}
@@ -154,7 +151,6 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 	}
 
 	return nil
-	//return ebitenutil.DebugPrint(screen, fmt.Sprintf("\nFPS: %.2f", ebiten.CurrentFPS()))
 }
 
 //SetMobile tells the game if it's on mobile or not
