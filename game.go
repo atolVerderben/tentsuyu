@@ -142,9 +142,9 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 		if err := g.gameState.Draw(g); err != nil {
 			return err
 		}
-		if err := g.UIController.Draw(g.Screen); err != nil {
+		/*if err := g.UIController.Draw(g.Screen); err != nil {
 			return err
-		}
+		}*/
 		if err := g.GameDrawLoop(g.Screen); err != nil {
 			return err
 		}

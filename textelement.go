@@ -1,15 +1,14 @@
 package tentsuyu
 
 import (
-	"image"
 	"log"
 
 	"image/color"
 
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten"
+	txt "github.com/hajimehoshi/ebiten/text"
 	"golang.org/x/image/font"
-	"golang.org/x/image/math/fixed"
 )
 
 //TextElement contains the font, text, and position of that current text element
@@ -117,7 +116,15 @@ func (t *TextElement) SetFontSize(fntSize float64) {
 }
 
 func (t *TextElement) drawText(text []string) error {
-	w, h := t.GetSize()
+	t.drawImage.Clear()
+	txt.Draw(t.drawImage, text[0], truetype.NewFace(t.font, &truetype.Options{
+		Size:    t.fntSize,
+		DPI:     t.fntDpi,
+		Hinting: font.HintingNone,
+	}), 0, int(t.fntSize), t.textColor)
+
+	return nil
+	/*w, h := t.GetSize()
 	dst := image.NewRGBA(image.Rect(0, 0, w, h))
 
 	d := &font.Drawer{
@@ -133,7 +140,7 @@ func (t *TextElement) drawText(text []string) error {
 	/*if t.textColor != color.Black {
 		highlight = color.Black
 	}*/
-	d2 := &font.Drawer{
+	/*d2 := &font.Drawer{
 		Dst: dst,
 		Src: image.NewUniform(highlight),
 		Face: truetype.NewFace(t.font, &truetype.Options{
@@ -154,7 +161,7 @@ func (t *TextElement) drawText(text []string) error {
 	}
 
 	return t.drawImage.ReplacePixels(dst.Pix)
-
+	*/
 }
 
 //SetDropShadow of the TextElement. If true then a second outline will be drawn.
@@ -196,15 +203,22 @@ func (t *TextElement) SetPosition(x, y float64) {
 }
 
 //Draw the TextElement
-func (t *TextElement) Draw(screen *ebiten.Image) error {
+func (t *TextElement) Draw(screen *ebiten.Image, camera *Camera) error {
 	if t.visible == false {
 		return nil
 	}
+
+	/*txt.Draw(screen, t.text[0], truetype.NewFace(t.font, &truetype.Options{
+		Size:    t.fntSize,
+		DPI:     t.fntDpi,
+		Hinting: font.HintingNone,
+	}), int(t.GetX()), int(t.GetY()), t.textColor)
+	*/
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(t.GetPosition())
 	//GameCamera.DrawCameraTransform(op)
 	if !t.Stationary {
-		//ApplyCameraTransform(op, false)
+		camera.ApplyCameraTransform(op, true)
 	}
 	if err := screen.DrawImage(t.drawImage, op); err != nil {
 		return err

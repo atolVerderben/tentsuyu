@@ -54,18 +54,18 @@ func (hud *HUD) Update() {
 }
 
 //Draw All elements
-func (hud *HUD) Draw(screen *ebiten.Image) {
+func (hud *HUD) Draw(screen *ebiten.Image, camera *Camera) {
 	for _, element := range hud.topLeft.elements {
-		element.Draw(screen)
+		element.Draw(screen, camera)
 	}
 	for _, element := range hud.topRight.elements {
-		element.Draw(screen)
+		element.Draw(screen, camera)
 	}
 	for _, element := range hud.bottomRight.elements {
-		element.Draw(screen)
+		element.Draw(screen, camera)
 	}
 	for _, element := range hud.bottomLeft.elements {
-		element.Draw(screen)
+		element.Draw(screen, camera)
 	}
 }
 

@@ -62,6 +62,6 @@ func (tb *TextBox) Update(input *InputController) {
 }
 
 //Draw the textbox
-func (tb *TextBox) Draw(screen *ebiten.Image) error {
-	return tb.Text.Draw(screen)
+func (tb *TextBox) Draw(screen *ebiten.Image, camera *Camera) error {
+	return tb.Text.Draw(screen, camera)
 }

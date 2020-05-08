@@ -14,7 +14,7 @@ import (
 //UIElement is the interface for all UI elements
 type UIElement interface {
 	Update()
-	Draw(*ebiten.Image) error
+	Draw(*ebiten.Image, *Camera) error
 	Highlighted() bool
 	UnHighlighted() bool
 	AddPosition(float64, float64)
@@ -196,14 +196,14 @@ func (ui *UIController) ShowMouse() {
 }
 
 //Draw all ui elements
-func (ui UIController) Draw(screen *ebiten.Image) error {
+func (ui UIController) Draw(screen *ebiten.Image, camera *Camera) error {
 
 	for _, t := range ui.textElements {
-		t.Draw(screen)
+		t.Draw(screen, camera)
 	}
 	for _, m := range ui.menus {
 		if m.Active {
-			m.Draw(screen)
+			m.Draw(screen, camera)
 		}
 	}
 	if ui.customCursor == true && ui.DrawCursor == true {

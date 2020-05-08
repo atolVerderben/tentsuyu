@@ -102,7 +102,7 @@ func (m *Menu) Update(input *InputController, offsetX, offsetY float64) {
 }
 
 //Draw window
-func (m *Menu) Draw(screen *ebiten.Image) {
+func (m *Menu) Draw(screen *ebiten.Image, camera *Camera) {
 	if m.background {
 		//w := 50.0 //float64(m.maxWidth) / 2
 		//h := 50.0 //float64(m.maxHeight) / 2
@@ -123,7 +123,7 @@ func (m *Menu) Draw(screen *ebiten.Image) {
 	for x := range m.Elements {
 		for y := range m.Elements[x] {
 			if !m.Elements[x][y].hidden {
-				m.Elements[x][y].UIElement.Draw(screen)
+				m.Elements[x][y].UIElement.Draw(screen, camera)
 			}
 		}
 	}
