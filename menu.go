@@ -74,6 +74,10 @@ func (m *Menu) Update(input *InputController, offsetX, offsetY float64) {
 
 	for x := range m.Elements {
 		for y := range m.Elements[x] {
+			switch e := m.Elements[x][y].UIElement.(type) {
+			case *TextElement:
+				e.NotCentered = true
+			}
 			mx := m.x + m.Elements[x][y].menuX
 			my := m.y + m.Elements[x][y].menuY
 
@@ -219,8 +223,9 @@ func (m *MenuElement) Update(input *InputController, offsetX, offsetY float64) b
 	if m.hidden {
 		return false
 	}
+	mx, my := input.GetMouseCoords()
 	mouseHighlight := false
-	if m.UIElement.Contains(input.Mouse.X+offsetX, input.Mouse.Y+offsetY) {
+	if m.UIElement.Contains(mx+offsetX, my+offsetY) {
 		if m.Selectable {
 			mouseHighlight = true
 			m.Highlighted()

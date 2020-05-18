@@ -23,16 +23,17 @@ type TextElement struct {
 	Stationary                           bool
 	textColor, origColor, highlightColor color.Color
 	*BasicUIElement
+	fntFace font.Face
 }
 
 //NewTextElement returns a new TextElement and creates the image
-func NewTextElement(x, y float64, w, h int, font *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextElement {
+func NewTextElement(x, y float64, w, h int, fnt *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextElement {
 	textImage, err := ebiten.NewImage(w, h, ebiten.FilterNearest)
 	if err != nil {
 		log.Fatal(err)
 	}
 	t := &TextElement{
-		font:           font,
+		font:           fnt,
 		fntSize:        fntSize,
 		fntDpi:         72,
 		drawImage:      textImage,
@@ -45,18 +46,23 @@ func NewTextElement(x, y float64, w, h int, font *truetype.Font, text []string, 
 		highlightColor: color.RGBA{153, 153, 0, 255},
 		dropShadow:     true,
 	}
+	t.fntFace = truetype.NewFace(t.font, &truetype.Options{
+		Size:    t.fntSize,
+		DPI:     t.fntDpi,
+		Hinting: font.HintingNone,
+	})
 	t.drawText(t.text)
 	return t
 }
 
 //NewTextElementStationary returns a new TextElement and creates the image
-func NewTextElementStationary(x, y float64, w, h int, font *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextElement {
+func NewTextElementStationary(x, y float64, w, h int, fnt *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextElement {
 	textImage, err := ebiten.NewImage(w, h, ebiten.FilterNearest)
 	if err != nil {
 		log.Fatal(err)
 	}
 	t := &TextElement{
-		font:           font,
+		font:           fnt,
 		fntSize:        fntSize,
 		fntDpi:         72,
 		drawImage:      textImage,
@@ -69,6 +75,11 @@ func NewTextElementStationary(x, y float64, w, h int, font *truetype.Font, text 
 		Stationary:     true,
 		highlightColor: color.RGBA{153, 153, 0, 255},
 	}
+	t.fntFace = truetype.NewFace(t.font, &truetype.Options{
+		Size:    t.fntSize,
+		DPI:     t.fntDpi,
+		Hinting: font.HintingNone,
+	})
 	t.drawText(t.text)
 	return t
 }
@@ -117,11 +128,17 @@ func (t *TextElement) SetFontSize(fntSize float64) {
 
 func (t *TextElement) drawText(text []string) error {
 	t.drawImage.Clear()
-	txt.Draw(t.drawImage, text[0], truetype.NewFace(t.font, &truetype.Options{
-		Size:    t.fntSize,
-		DPI:     t.fntDpi,
-		Hinting: font.HintingNone,
-	}), 0, int(t.fntSize), t.textColor)
+
+	tx := ""
+	for i := range text {
+		tx += text[i]
+		//Add a newline if multiple lines
+		if i != len(text)-1 {
+			tx += "\n"
+		}
+	}
+
+	txt.Draw(t.drawImage, text[0], t.fntFace, 0, int(t.fntSize), t.textColor)
 
 	return nil
 	/*w, h := t.GetSize()
@@ -215,6 +232,13 @@ func (t *TextElement) Draw(screen *ebiten.Image, camera *Camera) error {
 	}), int(t.GetX()), int(t.GetY()), t.textColor)
 	*/
 	op := &ebiten.DrawImageOptions{}
+	//move to center to rotate
+	op.GeoM.Translate(-t.GetWidthF()/2, -t.GetHeightF()/2)
+	op.GeoM.Rotate(t.GetAngle())
+	if t.NotCentered {
+		//move back to corner for placement
+		op.GeoM.Translate(t.GetWidthF()/2, t.GetHeightF()/2)
+	}
 	op.GeoM.Translate(t.GetPosition())
 	//GameCamera.DrawCameraTransform(op)
 	if !t.Stationary {

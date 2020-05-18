@@ -375,5 +375,5 @@ func (u BasicUIElement) Size() (int, int) {
 
 //Contains the specified x and y position
 func (u *BasicUIElement) Contains(x, y float64) bool {
-	return u.ContainsNoCenter(x, y)
+	return u.BasicObject.Contains(x, y)
 }

@@ -19,26 +19,45 @@ func NearCoords(x, y, x1, y1, radius float64) bool {
 
 //WithinDistance is a simple function to check if x is withing a certain distance of x1
 func WithinDistance(x, x1, radius float64) bool {
-	if x <= (x1+radius) && x >= (x1-radius) {
+	if (x) <= ((x1)+radius) && (x) >= ((x1)-radius) {
 		return true
 	}
 	return false
 }
 
+//PercentDifference returns the percent difference between n1 and n2 to determine how close they are based on the larger number
+func PercentDifference(n1, n2 float64) float64 {
+	if n1 > n2 {
+		return ((n1 - n2) / n1) * 100
+	}
+	//else
+	return ((n2 - n1) / n2) * 100
+}
+
 //RandomBetween returns a random int between min and max respectively
 //This is just a useful function for many reasons
 func RandomBetween(min, max int) int {
+	if min > max {
+		tmp := min
+		min = max
+		max = tmp
+	}
 	return rand.Intn(max-min) + min
 }
 
 //RandomBetweenf is the same as RandomBetween but takes and returns float64 values
 func RandomBetweenf(min, max float64) float64 {
+	if min > max {
+		tmp := min
+		min = max
+		max = tmp
+	}
 	return min + rand.Float64()*(max-min)
 }
 
 //Distance returns the scalar distance between two points
-func Distance(x, y, x1, y1 float64) float64 {
-	return math.Sqrt(math.Pow(x-x1, 2) + math.Pow(y-y1, 2))
+func Distance(x1, y1, x2, y2 float64) float64 {
+	return math.Sqrt(math.Pow(x2-x1, 2) + math.Pow(y2-y1, 2))
 }
 
 //DegreeToRadian takes a given degree and returns the radian value
