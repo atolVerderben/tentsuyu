@@ -1,6 +1,7 @@
 package tentsuyu
 
 import (
+	"log"
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten"
@@ -21,22 +22,23 @@ type GameLoadAudioFunction func() *AudioPlayer
 
 //Game represents, well... the game
 type Game struct {
-	imageLoadedCh     chan *ImageManager
-	audioLoadedCh     chan *AudioPlayer
-	gameState         GameState
-	PausedState       GameState
-	GameData          *GameData
-	Screen            *ebiten.Image
-	DefaultCamera     *Camera
-	UIController      *UIController
-	Random            *rand.Rand
-	Input             *InputController
-	ImageManager      *ImageManager
-	GameStateLoop     GameHelperFunction
-	GameDrawLoop      GameDrawHelperFunction
-	AudioPlayer       *AudioPlayer
-	AdditionalCameras map[string]*Camera
-	IsMobile          bool
+	imageLoadedCh             chan *ImageManager
+	audioLoadedCh             chan *AudioPlayer
+	gameState                 GameState
+	PausedState               GameState
+	GameData                  *GameData
+	Screen                    *ebiten.Image
+	DefaultCamera             *Camera
+	UIController              *UIController
+	Random                    *rand.Rand
+	Input                     *InputController
+	ImageManager              *ImageManager
+	GameStateLoop             GameHelperFunction
+	GameDrawLoop              GameDrawHelperFunction
+	AudioPlayer               *AudioPlayer
+	AdditionalCameras         map[string]*Camera
+	IsMobile                  bool
+	screenWidth, screenHeight int
 }
 
 //NewGame returns a new Game while setting the width and height of the screen
@@ -51,6 +53,8 @@ func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 		ImageManager:      NewImageManager(),
 		AdditionalCameras: map[string]*Camera{},
 	}
+	game.screenWidth = int(screenWidth)
+	game.screenHeight = int(screenHeight)
 	game.UIController = NewUIController(game.Input)
 	game.AudioPlayer, err = NewAudioPlayer()
 	game.gameState = NewBaseGameState()
@@ -105,9 +109,9 @@ func (g *Game) ToggleFullscreen() {
 	}
 }
 
-//Loop is the main game loop
-func (g *Game) Loop(screen *ebiten.Image) error {
-
+// Update proceeds the game state.
+// Update is called every tick (1/60 [s] by default).
+func (g *Game) Update(screen *ebiten.Image) error {
 	if g.imageLoadedCh != nil || g.audioLoadedCh != nil {
 		select {
 		case g.ImageManager = <-g.imageLoadedCh:
@@ -124,7 +128,6 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 	}
 
 	g.Input.Update()
-	g.Screen = screen
 
 	if err := g.GameStateLoop(); err != nil {
 		return err
@@ -138,16 +141,39 @@ func (g *Game) Loop(screen *ebiten.Image) error {
 	if g.Input.Button("ToggleFullscreen").JustPressed() {
 		g.ToggleFullscreen()
 	}
+	return nil
+}
+
+// Draw draws the game screen.
+// Draw is called every frame (typically 1/60[s] for 60Hz display).
+func (g *Game) Draw(screen *ebiten.Image) {
+	g.Screen = screen
+
+	if err := g.gameState.Draw(g); err != nil {
+		log.Fatal(err)
+	}
+	/*if err := g.UIController.Draw(g.Screen); err != nil {
+		log.Fatal(err)
+	}*/
+	if err := g.GameDrawLoop(screen); err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+// Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
+// If you don't have to adjust the screen size with the outside size, just return a fixed size.
+func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
+	return g.screenWidth, g.screenHeight
+}
+
+//Loop is the main game loop
+//This is for backwards compatibility with older ebiten
+func (g *Game) Loop(screen *ebiten.Image) error {
+
+	g.Update(screen)
 	if !ebiten.IsDrawingSkipped() {
-		if err := g.gameState.Draw(g); err != nil {
-			return err
-		}
-		/*if err := g.UIController.Draw(g.Screen); err != nil {
-			return err
-		}*/
-		if err := g.GameDrawLoop(g.Screen); err != nil {
-			return err
-		}
+		g.Draw(screen)
 	}
 
 	return nil
