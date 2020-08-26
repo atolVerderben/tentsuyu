@@ -252,3 +252,11 @@ func (m *MenuElement) Update(input *InputController, offsetX, offsetY float64) b
 func (m *MenuElement) Hide(h bool) {
 	m.hidden = h
 }
+
+//SetCentered centers the MenuElement based on bool value c
+func (m *MenuElement) SetCentered(c bool) {
+	switch e := m.UIElement.(type) { //Check the type of element
+	case *TextElement:
+		e.SetCentered(c)
+	}
+}

@@ -52,6 +52,13 @@ func NewTextElement(x, y float64, w, h int, fnt *truetype.Font, text []string, t
 		Hinting: font.HintingNone,
 	})
 	t.drawText(t.text)
+	t.SetCentered(false)
+	return t
+}
+
+func NewTextElementCentered(x, y float64, w, h int, fnt *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextElement {
+	t := NewTextElement(x, y, w, h, fnt, text, textColor, fntSize)
+	t.SetCentered(true)
 	return t
 }
 
@@ -137,8 +144,7 @@ func (t *TextElement) drawText(text []string) error {
 			tx += "\n"
 		}
 	}
-
-	txt.Draw(t.drawImage, text[0], t.fntFace, 0, int(t.fntSize), t.textColor)
+	txt.Draw(t.drawImage, tx, t.fntFace, 0, int(t.fntSize), t.textColor)
 
 	return nil
 	/*w, h := t.GetSize()
@@ -282,6 +288,11 @@ func (t *TextElement) DrawApplyZoom(screen *ebiten.Image) error {
 		return err
 	}
 	return nil
+}
+
+//SetCentered sets whether the TextElement is centered with bool value c
+func (t *TextElement) SetCentered(c bool) {
+	t.NotCentered = !c
 }
 
 func testEq(a, b []string) bool {
