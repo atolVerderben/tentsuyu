@@ -1,6 +1,6 @@
 package tentsuyu
 
-import "github.com/hajimehoshi/ebiten"
+import "github.com/hajimehoshi/ebiten/v2"
 
 // A Button is an input which can be either JustPressed, JustReleased or Down. Common uses would be for, a jump key or an action key.
 type Button struct {

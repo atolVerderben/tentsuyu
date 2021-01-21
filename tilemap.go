@@ -7,7 +7,7 @@ import (
 	"math"
 	"os"
 
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 //Map represents an entire Tiled map
@@ -248,7 +248,6 @@ func (t *Tile) DetermineTileSet(tilemap *Map) {
 func (t *Tile) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 
 	op := &ebiten.DrawImageOptions{}
-	op.ImageParts = t.BasicImageParts
 	//op.GeoM.Translate(float64(-t.BasicObject.Width/2), float64(-t.BasicObject.Height/2))
 	//op.GeoM.Scale(float64(scalex), float64(scaley))
 	op.GeoM.Translate(t.GetX(), t.GetY())
@@ -257,7 +256,7 @@ func (t *Tile) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	//ApplyCameraTransform(op, true)
 	//if Components.Camera.OnScreen(t.X, t.Y) {
 	if t.ImageName != "" {
-		screen.DrawImage(imageManager.ReturnImage(t.ImageName), op)
+		screen.DrawImage(t.BasicImageParts.SubImage(imageManager.ReturnImage(t.ImageName)), op)
 	}
 	//}
 
@@ -268,10 +267,6 @@ func (t *Tile) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 func (tl *TileLayer) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	if tl.IsImageLayer {
 		op := &ebiten.DrawImageOptions{}
-		op.ImageParts = &BasicImageParts{
-			Height: tl.Height,
-			Width:  tl.Width,
-		}
 		//op.GeoM.Translate(float64(-t.BasicObject.Width/2), float64(-t.BasicObject.Height/2))
 		//op.GeoM.Scale(float64(scalex), float64(scaley))
 		op.GeoM.Translate(tl.X, tl.Y)
@@ -279,7 +274,7 @@ func (tl *TileLayer) Draw(screen *ebiten.Image, imageManager *ImageManager) erro
 		//log.Printf("%v,%v\n", scalex, scaley)
 		//ApplyCameraTransform(op, true)
 
-		screen.DrawImage(imageManager.ReturnImage(tl.ImageName), op)
+		screen.DrawImage(BasicImageParts{Height: tl.Height, Width: tl.Width}.SubImage(imageManager.ReturnImage(tl.ImageName)), op)
 
 		return nil
 	}

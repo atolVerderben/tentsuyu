@@ -3,7 +3,7 @@ package tentsuyu
 import (
 	"sync"
 
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 const (

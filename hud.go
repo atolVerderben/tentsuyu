@@ -1,6 +1,6 @@
 package tentsuyu
 
-import "github.com/hajimehoshi/ebiten"
+import "github.com/hajimehoshi/ebiten/v2"
 
 //HUD represents the player's Heads Up Display
 type HUD struct {

@@ -3,21 +3,18 @@ package tentsuyu
 import (
 	"image"
 	"image/color"
-	"log"
 
 	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 	"golang.org/x/image/font"
 	"golang.org/x/image/math/fixed"
 )
 
 //RenderTextToImage takes a given slice of strings and returns a pointer to an ebiten.Image
-func RenderTextToImage(text []string, w, h int, fntSize float64, fnt *truetype.Font, textColor color.Color) (*ebiten.Image, error) {
+func RenderTextToImage(text []string, w, h int, fntSize float64, fnt *truetype.Font, textColor color.Color) *ebiten.Image {
 
-	drawImage, err := ebiten.NewImage(w, h, ebiten.FilterNearest)
-	if err != nil {
-		log.Fatal(err)
-	}
+	drawImage := ebiten.NewImage(w, h)
+
 	//w, h := t.GetSize()
 	dst := image.NewRGBA(image.Rect(0, 0, w, h))
 	//const size = 24
@@ -53,7 +50,7 @@ func RenderTextToImage(text []string, w, h int, fntSize float64, fnt *truetype.F
 		y += fntSize
 	}
 
-	err = drawImage.ReplacePixels(dst.Pix)
-	return drawImage, err
+	drawImage.ReplacePixels(dst.Pix)
+	return drawImage
 
 }

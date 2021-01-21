@@ -3,7 +3,7 @@ package tentsuyu
 import (
 	"image"
 
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 //BasicImageParts is easy to set up basic sprite image

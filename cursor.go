@@ -1,6 +1,6 @@
 package tentsuyu
 
-import "github.com/hajimehoshi/ebiten"
+import "github.com/hajimehoshi/ebiten/v2"
 
 //Cursor represents the player's mouse position
 type Cursor struct {
@@ -53,16 +53,14 @@ func (c *Cursor) SetStyle(cursorstyle int) {
 func (c *Cursor) Draw(screen *ebiten.Image) error {
 	w, h := c.GetSize()
 	op := &ebiten.DrawImageOptions{}
-	op.ImageParts = c.BasicImageParts
+	//op.ImageParts = c.BasicImageParts
 	if !c.NotCentered {
 		op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
 	}
 	op.GeoM.Translate(c.GetPosition())
 	//ApplyCameraTransform(op, false)
 
-	if err := screen.DrawImage(c.spritesheet, op); err != nil {
-		return err
-	}
+	screen.DrawImage(c.BasicImageParts.SubImage(c.spritesheet), op)
 
 	return nil
 }

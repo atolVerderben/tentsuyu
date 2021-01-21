@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 //TextArea represents a typeable area

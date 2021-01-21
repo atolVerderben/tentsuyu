@@ -8,7 +8,7 @@ import (
 	"image/color"
 
 	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 //UIElement is the interface for all UI elements
@@ -180,18 +180,18 @@ func (ui *UIController) SetCustomCursor(width, height, sx, sy int, spritesheet *
 	ui.DrawCursor = true
 	ui.customCursor = true
 	ui.Cursor = c
-	ebiten.SetCursorVisibility(false)
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 }
 
 //HideMouse both custom and default
 func (ui *UIController) HideMouse() {
-	ebiten.SetCursorVisibility(false)
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ui.DrawCursor = false
 }
 
 //ShowMouse shows the mouse, custom or default
 func (ui *UIController) ShowMouse() {
-	ebiten.SetCursorVisibility(true)
+	ebiten.SetCursorMode(ebiten.CursorModeVisible)
 	ui.DrawCursor = true
 }
 

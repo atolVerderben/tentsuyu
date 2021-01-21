@@ -1,7 +1,10 @@
 package tentsuyu
 
-import "github.com/hajimehoshi/ebiten"
-import "sync"
+import (
+	"sync"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 const (
 	// MouseStateUp is a state for when the key is not currently being pressed

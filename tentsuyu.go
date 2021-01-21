@@ -2,10 +2,9 @@ package tentsuyu
 
 import (
 	"image/color"
-	"log"
 	"math"
 
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 //Pixel is a 1x1 white pixel that can be used for simple drawing
@@ -13,12 +12,9 @@ var Pixel *ebiten.Image
 
 func init() {
 	//Create Pixel
-	var err error
 	//Simple white 1x1 pixel image for manipulation
-	Pixel, err := ebiten.NewImage(1, 1, ebiten.FilterNearest)
-	if err != nil {
-		log.Fatal(err)
-	}
+	Pixel := ebiten.NewImage(1, 1)
+
 	Pixel.Fill(color.RGBA{R: 255, G: 255, B: 255, A: 255})
 }
 
@@ -64,7 +60,7 @@ func DrawLine(dst *ebiten.Image, x1, y1, x2, y2 float64, clr color.Color, camera
 	camera.ApplyCameraTransform(op, true)
 	// Filter must be 'nearest' filter (default).
 	// Linear filtering would make edges blurred.
-	_ = dst.DrawImage(Pixel, op)
+	dst.DrawImage(Pixel, op)
 }
 
 func colorScale(clr color.Color) (rf, gf, bf, af float64) {

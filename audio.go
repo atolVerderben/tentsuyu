@@ -1,17 +1,18 @@
 package tentsuyu
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
 	"time"
 
 	"github.com/h2non/filetype"
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/audio"
-	"github.com/hajimehoshi/ebiten/audio/mp3"
-	"github.com/hajimehoshi/ebiten/audio/vorbis"
-	"github.com/hajimehoshi/ebiten/audio/wav"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
+	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 )
 
 var (
@@ -33,12 +34,8 @@ type AudioPlayer struct {
 //NewAudioPlayer returns a new AudioPlayer
 func NewAudioPlayer() (*AudioPlayer, error) {
 	sampleRate := 44100
-	var err error
 	if audioContext == nil {
-		audioContext, err = audio.NewContext(sampleRate)
-		if err != nil {
-			panic(err)
-		}
+		audioContext = audio.NewContext(sampleRate)
 	}
 	//const bytesPerSample = 4
 
@@ -64,7 +61,7 @@ func (p *AudioPlayer) PlaySE(se string) error {
 	if p.muteSE {
 		return nil
 	}
-	sePlayer, _ := audio.NewPlayerFromBytes(p.audioContext, p.seBytes[se])
+	sePlayer := audio.NewPlayerFromBytes(p.audioContext, p.seBytes[se])
 	sePlayer.SetVolume(p.seVolume[se])
 	sePlayer.Play()
 
@@ -118,19 +115,19 @@ func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume flo
 	var s io.Reader
 	var err error
 	if filetype.IsExtension(fb, "wav") {
-		s, err = wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		s, err = wav.Decode(audioContext, bytes.NewReader(fb))
 		if err != nil {
 			log.Fatal(err)
 
 		}
 	} else if filetype.IsExtension(fb, "mp3") {
-		s, err = mp3.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		s, err = mp3.Decode(audioContext, bytes.NewReader(fb))
 		if err != nil {
 			log.Fatal(err)
 
 		}
 	} else if filetype.IsExtension(fb, "ogg") {
-		s, err = vorbis.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		s, err = vorbis.Decode(audioContext, bytes.NewReader(fb))
 		if err != nil {
 			log.Fatal(err)
 
@@ -158,22 +155,22 @@ func (p *AudioPlayer) AddSongFromFile(name, filelocation string) error {
 
 //AddSongFromBytes takes the byte slice of the song file
 func (p *AudioPlayer) AddSongFromBytes(name string, fb []byte) error {
-	var s io.ReadCloser
+	var s io.Reader
 	var err error
 	if filetype.IsExtension(fb, "wav") {
-		s, err = wav.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		s, err = wav.Decode(audioContext, bytes.NewReader(fb))
 		if err != nil {
 			log.Fatal(err)
 
 		}
 	} else if filetype.IsExtension(fb, "mp3") {
-		s, err = mp3.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		s, err = mp3.Decode(audioContext, bytes.NewReader(fb))
 		if err != nil {
 			log.Fatal(err)
 
 		}
 	} else if filetype.IsExtension(fb, "ogg") {
-		s, err = vorbis.Decode(audioContext, audio.BytesReadSeekCloser(fb))
+		s, err = vorbis.Decode(audioContext, bytes.NewReader(fb))
 		if err != nil {
 			log.Fatal(err)
 
@@ -223,4 +220,80 @@ func (p *AudioPlayer) UpdateVolumeIfNeeded() {
 		p.volume128 = 128
 	}
 	//p.audioPlayer.SetVolume(float64(p.volume128) / 128)
+}
+
+//JukeBox for playing songs
+
+//JukeBox is used to control BG Music at least.
+//Possible SE support
+type JukeBox struct {
+	AudioPlayer  *AudioPlayer
+	SongList     []string
+	songRepeat   int
+	CurrSong     string
+	NextSong     string
+	PrevSong     string
+	BGDefaultVol float64
+	CurrVol      float64
+	currIndx     int
+}
+
+//CreateJukeBox from passed audioplayer, music and sound effect lists
+func CreateJukeBox(audioPlayer *AudioPlayer, musicList []string) *JukeBox {
+	j := &JukeBox{
+		AudioPlayer:  audioPlayer,
+		SongList:     musicList,
+		BGDefaultVol: 0.3,
+		CurrVol:      0.3,
+		currIndx:     -1,
+	}
+	return j
+}
+
+//ContinuousPlay of the song based on passed song name
+func (j *JukeBox) ContinuousPlay(songName string) {
+	/*for i, s := range j.SongList {
+		if s == songName {
+			j.currIndx = i
+		}
+		break
+	}*/
+	if !j.AudioPlayer.ReturnSongPlayer(songName).IsPlaying() && !j.AudioPlayer.IsMusicMuted() {
+		j.AudioPlayer.ReturnSongPlayer(songName).Rewind()
+		j.AudioPlayer.ReturnSongPlayer(songName).Play()
+		j.AudioPlayer.ReturnSongPlayer(songName).SetVolume(j.CurrVol)
+	}
+}
+
+//PlaySong with the given name at the passed volume
+func (j *JukeBox) PlaySong(songName string, vol float64) {
+	j.AudioPlayer.ReturnSongPlayer(songName).Rewind()
+	j.AudioPlayer.ReturnSongPlayer(songName).Play()
+	j.AudioPlayer.ReturnSongPlayer(songName).SetVolume(vol)
+}
+
+//PlayBG plays background music in the given order
+func (j *JukeBox) PlayBG() {
+	if j.currIndx == -1 {
+		j.currIndx = 0
+		j.CurrSong = j.SongList[j.currIndx]
+		j.PlaySong(j.CurrSong, j.CurrVol)
+	}
+	if !j.AudioPlayer.ReturnSongPlayer(j.CurrSong).IsPlaying() {
+		j.currIndx++
+		if j.currIndx < len(j.SongList) {
+			j.CurrSong = j.SongList[j.currIndx]
+			j.PlaySong(j.CurrSong, j.CurrVol)
+		} else {
+			j.currIndx = -1
+		}
+	}
+}
+
+//CurrentSongName returns the name of the song that is currently being played
+func (j *JukeBox) CurrentSongName() string {
+	if j.currIndx != -1 {
+		return j.SongList[j.currIndx]
+	}
+	return "No current song"
 }

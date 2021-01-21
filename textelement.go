@@ -1,13 +1,11 @@
 package tentsuyu
 
 import (
-	"log"
-
 	"image/color"
 
 	"github.com/golang/freetype/truetype"
-	"github.com/hajimehoshi/ebiten"
-	txt "github.com/hajimehoshi/ebiten/text"
+	"github.com/hajimehoshi/ebiten/v2"
+	txt "github.com/hajimehoshi/ebiten/v2/text"
 	"golang.org/x/image/font"
 )
 
@@ -28,10 +26,8 @@ type TextElement struct {
 
 //NewTextElement returns a new TextElement and creates the image
 func NewTextElement(x, y float64, w, h int, fnt *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextElement {
-	textImage, err := ebiten.NewImage(w, h, ebiten.FilterNearest)
-	if err != nil {
-		log.Fatal(err)
-	}
+	textImage := ebiten.NewImage(w, h)
+
 	t := &TextElement{
 		font:           fnt,
 		fntSize:        fntSize,
@@ -64,10 +60,8 @@ func NewTextElementCentered(x, y float64, w, h int, fnt *truetype.Font, text []s
 
 //NewTextElementStationary returns a new TextElement and creates the image
 func NewTextElementStationary(x, y float64, w, h int, fnt *truetype.Font, text []string, textColor color.Color, fntSize float64) *TextElement {
-	textImage, err := ebiten.NewImage(w, h, ebiten.FilterNearest)
-	if err != nil {
-		log.Fatal(err)
-	}
+	textImage := ebiten.NewImage(w, h)
+
 	t := &TextElement{
 		font:           fnt,
 		fntSize:        fntSize,
@@ -250,9 +244,7 @@ func (t *TextElement) Draw(screen *ebiten.Image, camera *Camera) error {
 	if !t.Stationary {
 		camera.ApplyCameraTransform(op, true)
 	}
-	if err := screen.DrawImage(t.drawImage, op); err != nil {
-		return err
-	}
+	screen.DrawImage(t.drawImage, op)
 	return nil
 }
 
@@ -267,9 +259,7 @@ func (t *TextElement) DrawPosition(screen *ebiten.Image, camera *Camera) error {
 	if !t.Stationary {
 		camera.ApplyCameraTransform(op, true)
 	}
-	if err := screen.DrawImage(t.drawImage, op); err != nil {
-		return err
-	}
+	screen.DrawImage(t.drawImage, op)
 	return nil
 }
 
@@ -284,9 +274,7 @@ func (t *TextElement) DrawApplyZoom(screen *ebiten.Image) error {
 	if !t.Stationary {
 		//ApplyCameraTransform(op, true)
 	}
-	if err := screen.DrawImage(t.drawImage, op); err != nil {
-		return err
-	}
+	screen.DrawImage(t.drawImage, op)
 	return nil
 }
 

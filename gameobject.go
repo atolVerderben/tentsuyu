@@ -5,7 +5,7 @@ import (
 
 	"github.com/rs/xid"
 
-	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 //GameObject is any renderable object

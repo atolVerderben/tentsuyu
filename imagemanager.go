@@ -8,8 +8,8 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 //NewImageManager creates a new pointer to ImageManager
@@ -32,7 +32,7 @@ func (im *ImageManager) LoadImageFromFile(name string, path string) error {
 //AddImageFromFile loads the given image at "path" with "name"
 func (im *ImageManager) AddImageFromFile(name string, path string) error {
 
-	img2, _, err := ebitenutil.NewImageFromFile(path, ebiten.FilterNearest)
+	img2, _, err := ebitenutil.NewImageFromFile(path)
 	if err != nil {
 		return err
 	}
@@ -58,10 +58,7 @@ func (im *ImageManager) AddImageFromBytes(name string, b []byte) error {
 	if err != nil {
 		return err
 	}
-	img2, err := ebiten.NewImageFromImage(img, ebiten.FilterNearest)
-	if err != nil {
-		return err
-	}
+	img2 := ebiten.NewImageFromImage(img)
 
 	im.Images[name] = img2
 
