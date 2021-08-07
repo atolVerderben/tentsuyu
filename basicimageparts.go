@@ -86,7 +86,7 @@ func (b *BasicImageParts) SetScale(op *ebiten.DrawImageOptions) {
 	if b.DestHeight == 0 {
 		b.DestHeight = b.Height
 	}
-	op.GeoM.Scale(float64(b.DestWidth/b.Width), float64(b.DestHeight/b.Height))
+	op.GeoM.Scale(float64(b.DestWidth)/float64(b.Width), float64(b.DestHeight)/float64(b.Height))
 }
 
 //BasicImagePartsFromSpriteSheet creates a BasicImageParts from a passed spritesheet on the passed frame.

@@ -55,7 +55,11 @@ func (a *Animation) Update() {
 			if a.frameCount > a.frameSpeed {
 				a.currFrame++
 				if a.currFrame >= len(a.Frames) {
-					a.currFrame = 0
+					if !a.Repeating {
+						a.currFrame = len(a.Frames) - 1
+					} else {
+						a.currFrame = 0
+					}
 					a.LoopCompleted = true
 				} else {
 					if a.LoopCompleted == true {
@@ -92,6 +96,7 @@ func (a *Animation) Update() {
 	if !a.Repeating && !a.paused {
 		if a.LoopCompleted {
 			a.Stop()
+			a.currFrame = len(a.Frames) - 1
 		}
 	}
 }

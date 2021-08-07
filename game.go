@@ -111,7 +111,7 @@ func (g *Game) ToggleFullscreen() {
 
 // Update proceeds the game state.
 // Update is called every tick (1/60 [s] by default).
-func (g *Game) Update(screen *ebiten.Image) error {
+func (g *Game) Update() error {
 	if g.imageLoadedCh != nil || g.audioLoadedCh != nil {
 		select {
 		case g.ImageManager = <-g.imageLoadedCh:
@@ -124,7 +124,6 @@ func (g *Game) Update(screen *ebiten.Image) error {
 		}
 	}
 	if g.imageLoadedCh != nil || g.audioLoadedCh != nil {
-		ebitenutil.DebugPrint(screen, "Now Loading...")
 		return nil
 	}
 
@@ -149,6 +148,11 @@ func (g *Game) Update(screen *ebiten.Image) error {
 // Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.Screen = screen
+
+	if g.imageLoadedCh != nil || g.audioLoadedCh != nil {
+		ebitenutil.DebugPrint(screen, "Now Loading...")
+		return
+	}
 
 	if err := g.gameState.Draw(g); err != nil {
 		log.Fatal(err)

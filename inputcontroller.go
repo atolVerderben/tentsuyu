@@ -63,6 +63,13 @@ func (ic *InputController) GetGameMouseCoords(camera *Camera) (x, y float64) {
 	return x, y
 }
 
+//GetGameMouseCoordsOffset returns the game coords based on the camera position and zoom with added offsets
+func (ic *InputController) GetGameMouseCoordsOffset(camera *Camera, xOffset, yOffset float64) (x, y float64) {
+	mx, my := ebiten.CursorPosition()
+	x, y = (float64(mx)+(camera.GetX()+xOffset))/(camera.Zoom), (float64(my)+(camera.GetY()+yOffset))/(camera.Zoom)
+	return x, y
+}
+
 //GetGameMouseCoordsNoZoom is the same as GetGameMouseCoords but ignores the camera's zoom level (useful for drawing the cursor)
 func (ic *InputController) GetGameMouseCoordsNoZoom(camera *Camera) (x, y float64) {
 	mx, my := ebiten.CursorPosition()

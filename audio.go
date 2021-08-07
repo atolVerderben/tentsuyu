@@ -83,6 +83,15 @@ func (p *AudioPlayer) MuteSE(m bool) {
 //MuteMusic sets the mute state of Music
 func (p *AudioPlayer) MuteMusic(m bool) {
 	p.muteMusic = m
+	for _, player := range p.songs {
+		player.Pause()
+	}
+}
+
+func (p *AudioPlayer) PauseAllMusic() {
+	for _, player := range p.songs {
+		player.Pause()
+	}
 }
 
 //IsSEMuted returns true if the sound effects are muted for the AudioPlayer
@@ -207,10 +216,10 @@ func (p *AudioPlayer) Update() error {
 //UpdateVolumeIfNeeded should be used to listen to changing the volume level
 //TODO: Implement this
 func (p *AudioPlayer) UpdateVolumeIfNeeded() {
-	if ebiten.IsKeyPressed(ebiten.KeyZ) {
+	if ebiten.IsKeyPressed(ebiten.KeyMinus) {
 		p.volume128--
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyX) {
+	if ebiten.IsKeyPressed(ebiten.KeyEqual) {
 		p.volume128++
 	}
 	if p.volume128 < 0 {

@@ -248,6 +248,36 @@ func (m *MenuElement) Update(input *InputController, offsetX, offsetY float64) b
 	return mouseHighlight
 }
 
+//UpdateWithCamera the MenuElement in context of the game camera
+func (m *MenuElement) UpdateWithCamera(input *InputController, camera *Camera, offsetX, offsetY float64) bool {
+	if m.hidden {
+		return false
+	}
+	mx, my := input.GetGameMouseCoords(camera)
+	mouseHighlight := false
+	if m.UIElement.Contains(mx+offsetX, my+offsetY) {
+		if m.Selectable {
+			mouseHighlight = true
+			m.Highlighted()
+			m.highlighted = true
+			if input.LeftClick().JustPressed() {
+
+				if m.Action != nil {
+					m.Action()
+				}
+			}
+		}
+	} else {
+		if m.highlighted == true {
+			m.highlighted = false
+			m.UnHighlighted()
+		}
+	}
+
+	m.UIElement.Update()
+	return mouseHighlight
+}
+
 //Hide takes a bool and sets the hidden variable
 func (m *MenuElement) Hide(h bool) {
 	m.hidden = h
