@@ -29,6 +29,7 @@ type AudioPlayer struct {
 	volume128         int
 	songs             map[string]*audio.Player
 	muteSE, muteMusic bool
+	sePlayers         map[string]*audio.Player
 }
 
 //NewAudioPlayer returns a new AudioPlayer
@@ -48,6 +49,7 @@ func NewAudioPlayer() (*AudioPlayer, error) {
 		seBytes:   make(map[string][]byte),
 		seVolume:  make(map[string]float64),
 		songs:     make(map[string]*audio.Player),
+		sePlayers: make(map[string]*audio.Player),
 	}
 	/*if player.total == 0 {
 		player.total = 1
@@ -61,12 +63,38 @@ func (p *AudioPlayer) PlaySE(se string) error {
 	if p.muteSE {
 		return nil
 	}
+
 	sePlayer := audio.NewPlayerFromBytes(p.audioContext, p.seBytes[se])
 	sePlayer.SetVolume(p.seVolume[se])
 	sePlayer.Play()
+	p.sePlayers[se] = sePlayer
 
 	return nil
 
+}
+
+func (p *AudioPlayer) PlaySEPersistent(se string) {
+	if p.muteSE {
+		return
+	}
+	if sep, ok := p.sePlayers[se]; ok {
+		sep.Rewind()
+		sep.SetVolume(p.seVolume[se])
+		sep.Play()
+	} else {
+		sePlayer := audio.NewPlayerFromBytes(p.audioContext, p.seBytes[se])
+		sePlayer.SetVolume(p.seVolume[se])
+		sePlayer.Play()
+		p.sePlayers[se] = sePlayer
+	}
+}
+
+//StopSE pauses and rewinds the player of that sound effect
+func (p *AudioPlayer) StopSE(se string) {
+	if sep, ok := p.sePlayers[se]; ok {
+		sep.Pause()
+		sep.Rewind()
+	}
 }
 
 //MuteAll sets the mute state of both SoundEffects and Music

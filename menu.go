@@ -253,9 +253,10 @@ func (m *MenuElement) UpdateWithCamera(input *InputController, camera *Camera, o
 	if m.hidden {
 		return false
 	}
-	mx, my := input.GetGameMouseCoords(camera)
+	x, y := input.GetMouseCoords()
+	mx, my := input.GetGameCoords(x+offsetX, y+offsetY, camera)
 	mouseHighlight := false
-	if m.UIElement.Contains(mx+offsetX, my+offsetY) {
+	if m.UIElement.Contains(mx, my) {
 		if m.Selectable {
 			mouseHighlight = true
 			m.Highlighted()

@@ -56,7 +56,13 @@ func (ic *InputController) GetMouseCoords() (float64, float64) {
 	return float64(x), float64(y)
 }
 
-//GetGameMouseCoords returns the game coords based on the camera position and zoom
+//GetGameCoords returns the game coords based on the camera position and zoom from provided X,Y coords
+func (ic *InputController) GetGameCoords(mx, my float64, camera *Camera) (x, y float64) {
+	x, y = (float64(mx)+(camera.GetX()))/(camera.Zoom), (float64(my)+(camera.GetY()))/(camera.Zoom)
+	return x, y
+}
+
+//GetGameMouseCoords returns the game coords based on the camera position and zoom from mouse click
 func (ic *InputController) GetGameMouseCoords(camera *Camera) (x, y float64) {
 	mx, my := ebiten.CursorPosition()
 	x, y = (float64(mx)+(camera.GetX()))/(camera.Zoom), (float64(my)+(camera.GetY()))/(camera.Zoom)
