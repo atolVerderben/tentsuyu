@@ -8,22 +8,25 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-//GameHelperFunction is a function that takes no parameters and returns an error
+// GameHelperFunction is a function that takes no parameters and returns an error
 type GameHelperFunction func() error
 
-//GameDrawHelperFunction is meant to draw something on the passed ebiten.Image
+// GameDrawHelperFunction is meant to draw something on the passed ebiten.Image
 type GameDrawHelperFunction func(*ebiten.Image) error
 
-//GameLoadImagesFunction returns an ImageManager which is used to load new images into the game
+// GameLoadImagesFunction returns an ImageManager which is used to load new images into the game
 type GameLoadImagesFunction func() *ImageManager
 
-//GameLoadAudioFunction returns an AudioPlayer and is used to load new audio into the game
+// GameLoadAudioFunction returns an AudioPlayer and is used to load new audio into the game
 type GameLoadAudioFunction func() *AudioPlayer
 
-//Game represents, well... the game
+type GameLoadSpriteSheetsFunction func() *SpriteSheetManager
+
+// Game represents, well... the game
 type Game struct {
 	imageLoadedCh             chan *ImageManager
 	audioLoadedCh             chan *AudioPlayer
+	spriteLoadCh              chan *SpriteSheetManager
 	gameState                 GameState
 	PausedState               GameState
 	GameData                  *GameData
@@ -33,6 +36,7 @@ type Game struct {
 	Random                    *rand.Rand
 	Input                     *InputController
 	ImageManager              *ImageManager
+	SpriteSheetManager        *SpriteSheetManager
 	GameStateLoop             GameHelperFunction
 	GameDrawLoop              GameDrawHelperFunction
 	AudioPlayer               *AudioPlayer
@@ -41,17 +45,19 @@ type Game struct {
 	screenWidth, screenHeight int
 }
 
-//NewGame returns a new Game while setting the width and height of the screen
+// NewGame returns a new Game while setting the width and height of the screen
 func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	game = &Game{
 		imageLoadedCh: make(chan *ImageManager),
 		audioLoadedCh: make(chan *AudioPlayer),
+		spriteLoadCh:  make(chan *SpriteSheetManager),
 		GameData:      NewGameData(),
 		//Random:            rand.New(rand.NewSource(time.Now().UnixNano())),
-		Input:             NewInputController(),
-		DefaultCamera:     CreateCamera(screenWidth, screenHeight),
-		ImageManager:      NewImageManager(),
-		AdditionalCameras: map[string]*Camera{},
+		Input:              NewInputController(),
+		DefaultCamera:      CreateCamera(screenWidth, screenHeight),
+		ImageManager:       NewImageManager(),
+		SpriteSheetManager: NewSpriteSheetManager(),
+		AdditionalCameras:  map[string]*Camera{},
 	}
 	game.screenWidth = int(screenWidth)
 	game.screenHeight = int(screenHeight)
@@ -100,7 +106,7 @@ func NewGame(screenWidth, screenHeight float64) (game *Game, err error) {
 	return
 }
 
-//ToggleFullscreen toggles the game in or out of full screen
+// ToggleFullscreen toggles the game in or out of full screen
 func (g *Game) ToggleFullscreen() {
 	if ebiten.IsFullscreen() {
 		ebiten.SetFullscreen(false)
@@ -112,7 +118,7 @@ func (g *Game) ToggleFullscreen() {
 // Update proceeds the game state.
 // Update is called every tick (1/60 [s] by default).
 func (g *Game) Update() error {
-	if g.imageLoadedCh != nil || g.audioLoadedCh != nil {
+	if g.imageLoadedCh != nil || g.audioLoadedCh != nil || g.spriteLoadCh != nil {
 		select {
 		case g.ImageManager = <-g.imageLoadedCh:
 
@@ -120,10 +126,13 @@ func (g *Game) Update() error {
 		case g.AudioPlayer = <-g.audioLoadedCh:
 
 			g.audioLoadedCh = nil
+
+		case g.SpriteSheetManager = <-g.spriteLoadCh:
+			g.spriteLoadCh = nil
 		default:
 		}
 	}
-	if g.imageLoadedCh != nil || g.audioLoadedCh != nil {
+	if g.imageLoadedCh != nil || g.audioLoadedCh != nil || g.spriteLoadCh != nil {
 		return nil
 	}
 
@@ -172,49 +181,49 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return g.screenWidth, g.screenHeight
 }
 
-//SetMobile tells the game if it's on mobile or not
-//This is useful to know whether to check for touches or keys
+// SetMobile tells the game if it's on mobile or not
+// This is useful to know whether to check for touches or keys
 func (g *Game) SetMobile(m bool) {
 	g.IsMobile = m
 }
 
-//SetGameState of the game
+// SetGameState of the game
 func (g *Game) SetGameState(gs GameState) {
 	g.gameState = gs
 }
 
-//GetGameState of the game
+// GetGameState of the game
 func (g Game) GetGameState() GameState {
 	return g.gameState
 }
 
-//SetPauseState of the game
-//This changes the PausedState to the current GameState then switches to the passed GameState.
-//Used to preserve the current game state
+// SetPauseState of the game
+// This changes the PausedState to the current GameState then switches to the passed GameState.
+// Used to preserve the current game state
 func (g *Game) SetPauseState(gs GameState) {
 	g.PausedState = g.gameState
 	g.gameState = gs
 	g.PausedState.SetMsg(GameStateMsgNone)
 }
 
-//UnPause switches back the the puasedState GameState of the Game
+// UnPause switches back the the puasedState GameState of the Game
 func (g *Game) UnPause() {
 	g.gameState = g.PausedState
 }
 
-//SetGameStateLoop should be a switch statement telling the game when to switch to what gamestate
-//This is where your gamestate logic will exist
+// SetGameStateLoop should be a switch statement telling the game when to switch to what gamestate
+// This is where your gamestate logic will exist
 func (g *Game) SetGameStateLoop(gFunction GameHelperFunction) {
 	g.GameStateLoop = gFunction
 }
 
-//SetGameDrawLoop allows the user to add a final draw over the game screen no matter what state the game is in.
+// SetGameDrawLoop allows the user to add a final draw over the game screen no matter what state the game is in.
 func (g *Game) SetGameDrawLoop(gFunction GameDrawHelperFunction) {
 	g.GameDrawLoop = gFunction
 }
 
-//LoadImages will set the imageLoadedCh to the passed GameHlperFunction
-//This is used to load images before a gamestate is set
+// LoadImages will set the imageLoadedCh to the passed GameHlperFunction
+// This is used to load images before a gamestate is set
 func (g *Game) LoadImages(gFunction GameLoadImagesFunction) {
 	go func() {
 		/*var imageManager *ImageManager
@@ -229,8 +238,22 @@ func (g *Game) LoadImages(gFunction GameLoadImagesFunction) {
 
 }
 
-//LoadAudio will set the audioLoadedCh to the passed GameHelperFunction
-//This is used to load audio before a gamestate is set
+func (g *Game) LoadSpriteSheets(gFunction GameLoadSpriteSheetsFunction) {
+	go func() {
+		/*var imageManager *ImageManager
+		if imageManager = gFunction(); imageManager != nil {
+			g.imageLoadedCh <- imageManager
+			//close(g.imageLoadedCh)
+		}*/
+		spriteSheetManager := gFunction()
+		g.spriteLoadCh <- spriteSheetManager
+
+	}()
+
+}
+
+// LoadAudio will set the audioLoadedCh to the passed GameHelperFunction
+// This is used to load audio before a gamestate is set
 func (g *Game) LoadAudio(gFunction GameLoadAudioFunction) {
 	go func() {
 		/*var audioPlayer *AudioPlayer
@@ -243,19 +266,19 @@ func (g *Game) LoadAudio(gFunction GameLoadAudioFunction) {
 	}()
 }
 
-//ScreenSize returns the width and height of the game screen
+// ScreenSize returns the width and height of the game screen
 func (g Game) ScreenSize() (w, h int) {
 	w, h = g.Screen.Size()
 	return w, h
 }
 
-//ScreenWidth returns the width of the game screen
+// ScreenWidth returns the width of the game screen
 func (g Game) ScreenWidth() int {
 	w, _ := g.Screen.Size()
 	return w
 }
 
-//ScreenHeight returns the height of the game screen
+// ScreenHeight returns the height of the game screen
 func (g Game) ScreenHeight() int {
 	_, h := g.Screen.Size()
 	return h

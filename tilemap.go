@@ -2,7 +2,6 @@ package tentsuyu
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"math"
 	"os"
@@ -10,7 +9,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-//Map represents an entire Tiled map
+// Map represents an entire Tiled map
 type Map struct {
 	Width       int         `json:"width"`
 	Height      int         `json:"height"`
@@ -23,7 +22,7 @@ type Map struct {
 	Version     int         `json:"version"`
 }
 
-//Layer represents a Tiled Layer
+// Layer represents a Tiled Layer
 type Layer struct {
 	Name       string       `json:"name"`
 	Type       string       `json:"type"`
@@ -41,7 +40,7 @@ type Layer struct {
 	//	ImageName  string               `json:"image"`
 }
 
-//TileSet represents a Tiled TileSet
+// TileSet represents a Tiled TileSet
 type TileSet struct {
 	FirstGID      int         `json:"firstgid"`
 	ImageName     string      `json:"image"`
@@ -59,7 +58,7 @@ type TileSet struct {
 	Rows, LastGID int
 }
 
-//MapObject is a representation of the Tiled Object
+// MapObject is a representation of the Tiled Object
 type MapObject struct {
 	Height   int     `json:"height"`
 	ID       int     `json:"id"`
@@ -72,14 +71,14 @@ type MapObject struct {
 	Y        float64 `json:"y"`
 }
 
-//Property of the layer/tile from Tiled
+// Property of the layer/tile from Tiled
 type Property struct {
 	Name     string `json:"name"`
 	PropType string `json:"type"`
 	Value    string `json:"value"`
 }
 
-//Tile is a renderable tile used by the game
+// Tile is a renderable tile used by the game
 type Tile struct {
 	Image     *ebiten.Image
 	Collide   bool
@@ -89,13 +88,13 @@ type Tile struct {
 	*BasicObject
 }
 
-//TileMap is the renderable map used by the game
+// TileMap is the renderable map used by the game
 type TileMap struct {
 	Layers                               []*TileLayer
 	Width, Height, TileWidth, TileHeight int
 }
 
-//TileLayer is the renderable layer used by the game
+// TileLayer is the renderable layer used by the game
 type TileLayer struct {
 	Data          []*Tile
 	DrawOrder     int
@@ -109,9 +108,9 @@ type TileLayer struct {
 	Properties    []*Property
 }
 
-//ReadMap from JSON file and dump into Map
+// ReadMap from JSON file and dump into Map
 func ReadMap(filename string) *Map {
-	raw, err := ioutil.ReadFile(filename)
+	raw, err := os.ReadFile(filename)
 	if err != nil {
 		log.Println(err.Error())
 		os.Exit(1)
@@ -122,7 +121,7 @@ func ReadMap(filename string) *Map {
 	return m
 }
 
-//ReadMapfromString reads an entire Map struct from a given string (represented by json)
+// ReadMapfromString reads an entire Map struct from a given string (represented by json)
 func ReadMapfromString(jString string) *Map {
 	raw := []byte(jString)
 
@@ -131,7 +130,7 @@ func ReadMapfromString(jString string) *Map {
 	return m
 }
 
-//ReadMapfromByte reads an entire Map struct from a byte slice
+// ReadMapfromByte reads an entire Map struct from a byte slice
 func ReadMapfromByte(byteMap []byte) *Map {
 
 	m := &Map{}
@@ -139,14 +138,14 @@ func ReadMapfromByte(byteMap []byte) *Map {
 	return m
 }
 
-//CreateTileMapFromFile creates a new TileMap based on the given filelocation
+// CreateTileMapFromFile creates a new TileMap based on the given filelocation
 func CreateTileMapFromFile(fileLocation string) *TileMap {
 	tilemap := ReadMap(fileLocation)
 	return CreateTileMap(tilemap)
 
 }
 
-//CreateTileMap creates a renderable TileMap
+// CreateTileMap creates a renderable TileMap
 func CreateTileMap(tilemap *Map) *TileMap {
 	tm := &TileMap{
 		Layers:     []*TileLayer{},
@@ -222,7 +221,7 @@ func CreateTileMap(tilemap *Map) *TileMap {
 	return tm
 }
 
-//DetermineTileSet of the given tile based on the GID
+// DetermineTileSet of the given tile based on the GID
 func (t *Tile) DetermineTileSet(tilemap *Map) {
 	for _, tileSet := range tilemap.TileSets {
 		if tileSet.FirstGID <= t.Gid {
@@ -244,7 +243,7 @@ func (t *Tile) DetermineTileSet(tilemap *Map) {
 	}
 }
 
-//Draw a single renderable Tile
+// Draw a single renderable Tile
 func (t *Tile) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 
 	op := &ebiten.DrawImageOptions{}
@@ -263,7 +262,7 @@ func (t *Tile) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	return nil
 }
 
-//Draw the entire TileLayer
+// Draw the entire TileLayer
 func (tl *TileLayer) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	if tl.IsImageLayer {
 		op := &ebiten.DrawImageOptions{}
@@ -285,7 +284,7 @@ func (tl *TileLayer) Draw(screen *ebiten.Image, imageManager *ImageManager) erro
 	return nil
 }
 
-//Draw the entire TileMap
+// Draw the entire TileMap
 func (tm *TileMap) Draw(screen *ebiten.Image, imageManager *ImageManager) error {
 	for x := 0; x < len(tm.Layers); x++ {
 		tm.Layers[x].Draw(screen, imageManager)
@@ -293,7 +292,7 @@ func (tm *TileMap) Draw(screen *ebiten.Image, imageManager *ImageManager) error 
 	return nil
 }
 
-//PrepareTileSet imports the tileset image, and sets LastGID and Rows for easier calculation
+// PrepareTileSet imports the tileset image, and sets LastGID and Rows for easier calculation
 func PrepareTileSet(tilemap *Map) { //, imageManager *ImageManager) {
 	for x, tileSet := range tilemap.TileSets {
 		//image := imageManager.ReturnImage(tilemap.TileSets[x].Name) //ebitenutil.NewImageFromFile(tilemap.TileSets[x].ImageName, ebiten.FilterNearest)
@@ -304,7 +303,7 @@ func PrepareTileSet(tilemap *Map) { //, imageManager *ImageManager) {
 	}
 }
 
-//ReturnImagePosition returns the image location within the tileset
+// ReturnImagePosition returns the image location within the tileset
 func (ts *TileSet) ReturnImagePosition(gid int) (float64, float64) {
 
 	gid = gid - (ts.FirstGID - 1)

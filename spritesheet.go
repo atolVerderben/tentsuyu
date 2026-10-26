@@ -2,19 +2,18 @@ package tentsuyu
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
 )
 
-//SpriteSheet holds all frames of a spritesheet from a json
+// SpriteSheet holds all frames of a spritesheet from a json
 type SpriteSheet struct {
 	Frames                                []Frame `json:"frames"`
 	framePaddingWidth, framePaddingHeight int
 }
 
-//Frame represents a single frame of a spritesheet
+// Frame represents a single frame of a spritesheet
 type Frame struct {
 	Filename         string             `json:"filename"`
 	Frame            map[string]int     `json:"frame"` // x, y, w, h
@@ -25,9 +24,9 @@ type Frame struct {
 	Pivot            map[string]float64 `json:"pivot"`
 }
 
-//ReadSpriteSheet reads a json file and returns a SpriteSheet struct
+// ReadSpriteSheet reads a json file and returns a SpriteSheet struct
 func ReadSpriteSheet(filename string) *SpriteSheet {
-	raw, err := ioutil.ReadFile(filename)
+	raw, err := os.ReadFile(filename)
 	if err != nil {
 		log.Println(err.Error())
 		os.Exit(1)
@@ -38,14 +37,14 @@ func ReadSpriteSheet(filename string) *SpriteSheet {
 	return m
 }
 
-//ReadSpriteSheetJSON from a byte slice
+// ReadSpriteSheetJSON from a byte slice
 func ReadSpriteSheetJSON(jsonByte []byte) *SpriteSheet {
 	m := &SpriteSheet{}
 	json.Unmarshal(jsonByte, m)
 	return m
 }
 
-//NewSpriteSheet returns a SpriteSheet struct with just a basic
+// NewSpriteSheet returns a SpriteSheet struct with just a basic
 func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWidth, paddingHeight int) *SpriteSheet {
 	s := &SpriteSheet{}
 
@@ -72,7 +71,7 @@ func NewSpriteSheet(imageWidth, imageHeight, frameWidth, frameHeight, paddingWid
 	return s
 }
 
-//ReturnImageParts returns the BasicImageParts at the given frame of the animation.
+// ReturnImageParts returns the BasicImageParts at the given frame of the animation.
 func (s SpriteSheet) ReturnImageParts(f int) *BasicImageParts {
 	i := &BasicImageParts{
 		Sx:     s.Frames[f].Frame["x"],

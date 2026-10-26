@@ -60,7 +60,7 @@ func (g *GameData) Update() {
 //TimeInSecond returns the current time in seconds
 func (g *GameData) TimeInSecond() int {
 
-	return int(time.Now().Sub(g.startTime).Seconds())
+	return int(time.Since(g.startTime).Seconds())
 
 	//return g.time / 60
 }
@@ -68,7 +68,7 @@ func (g *GameData) TimeInSecond() int {
 //TimeInMilliseconds returns the current time in seconds
 func (g *GameData) TimeInMilliseconds() int {
 
-	return int(time.Now().Sub(g.startTime).Nanoseconds() / int64(time.Millisecond))
+	return int(time.Since(g.startTime).Nanoseconds() / int64(time.Millisecond))
 
 	//return g.time / 60
 }
