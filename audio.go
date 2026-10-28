@@ -32,7 +32,7 @@ type AudioPlayer struct {
 	sePlayers         map[string]*audio.Player
 }
 
-//NewAudioPlayer returns a new AudioPlayer
+// NewAudioPlayer returns a new AudioPlayer
 func NewAudioPlayer() (*AudioPlayer, error) {
 	sampleRate := 44100
 	if audioContext == nil {
@@ -58,7 +58,7 @@ func NewAudioPlayer() (*AudioPlayer, error) {
 	return player, nil
 }
 
-//PlaySE playes the sound effect with the given name
+// PlaySE playes the sound effect with the given name
 func (p *AudioPlayer) PlaySE(se string) error {
 	if p.muteSE {
 		return nil
@@ -89,7 +89,7 @@ func (p *AudioPlayer) PlaySEPersistent(se string) {
 	}
 }
 
-//StopSE pauses and rewinds the player of that sound effect
+// StopSE pauses and rewinds the player of that sound effect
 func (p *AudioPlayer) StopSE(se string) {
 	if sep, ok := p.sePlayers[se]; ok {
 		sep.Pause()
@@ -97,18 +97,18 @@ func (p *AudioPlayer) StopSE(se string) {
 	}
 }
 
-//MuteAll sets the mute state of both SoundEffects and Music
+// MuteAll sets the mute state of both SoundEffects and Music
 func (p *AudioPlayer) MuteAll(m bool) {
 	p.muteSE = m
 	p.muteMusic = m
 }
 
-//MuteSE sets the mute state of SoundEffects
+// MuteSE sets the mute state of SoundEffects
 func (p *AudioPlayer) MuteSE(m bool) {
 	p.muteSE = m
 }
 
-//MuteMusic sets the mute state of Music
+// MuteMusic sets the mute state of Music
 func (p *AudioPlayer) MuteMusic(m bool) {
 	p.muteMusic = m
 	for _, player := range p.songs {
@@ -122,22 +122,22 @@ func (p *AudioPlayer) PauseAllMusic() {
 	}
 }
 
-//IsSEMuted returns true if the sound effects are muted for the AudioPlayer
+// IsSEMuted returns true if the sound effects are muted for the AudioPlayer
 func (p *AudioPlayer) IsSEMuted() bool {
 	return p.muteSE
 }
 
-//IsMusicMuted returns true if the music is muted for the AudioPlayer
+// IsMusicMuted returns true if the music is muted for the AudioPlayer
 func (p *AudioPlayer) IsMusicMuted() bool {
 	return p.muteMusic
 }
 
-//ReturnSongPlayer returns the player for the song audio
+// ReturnSongPlayer returns the player for the song audio
 func (p *AudioPlayer) ReturnSongPlayer(name string) *audio.Player {
 	return p.songs[name]
 }
 
-//AddSoundEffectFromFile adds a SE of the given name and volume at the file location.
+// AddSoundEffectFromFile adds a SE of the given name and volume at the file location.
 func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string, volume float64) error {
 	fb, err := ioutil.ReadFile(filelocation)
 	if err != nil {
@@ -147,7 +147,7 @@ func (p *AudioPlayer) AddSoundEffectFromFile(name, filelocation string, volume f
 	return p.AddSoundEffectFromBytes(name, fb, volume)
 }
 
-//AddSoundEffectFromBytes adds a new sound effect file from a byte slice
+// AddSoundEffectFromBytes adds a new sound effect file from a byte slice
 func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume float64) error {
 	var s io.Reader
 	var err error
@@ -180,7 +180,7 @@ func (p *AudioPlayer) AddSoundEffectFromBytes(name string, fb []byte, volume flo
 	return nil
 }
 
-//AddSongFromFile to the AudioPlayer
+// AddSongFromFile to the AudioPlayer
 func (p *AudioPlayer) AddSongFromFile(name, filelocation string) error {
 
 	fb, err := ioutil.ReadFile(filelocation)
@@ -190,7 +190,7 @@ func (p *AudioPlayer) AddSongFromFile(name, filelocation string) error {
 	return p.AddSongFromBytes(name, fb)
 }
 
-//AddSongFromBytes takes the byte slice of the song file
+// AddSongFromBytes takes the byte slice of the song file
 func (p *AudioPlayer) AddSongFromBytes(name string, fb []byte) error {
 	var s io.Reader
 	var err error
@@ -221,8 +221,8 @@ func (p *AudioPlayer) AddSongFromBytes(name string, fb []byte) error {
 	return nil
 }
 
-//Update isn't currently used for the AudioPlayer
-//TODO: Implement this ... if necessary
+// Update isn't currently used for the AudioPlayer
+// TODO: Implement this ... if necessary
 func (p *AudioPlayer) Update() error {
 	/*for _, se := range p.seSlice {
 		select {
@@ -241,8 +241,8 @@ func (p *AudioPlayer) Update() error {
 	return nil
 }
 
-//UpdateVolumeIfNeeded should be used to listen to changing the volume level
-//TODO: Implement this
+// UpdateVolumeIfNeeded should be used to listen to changing the volume level
+// TODO: Implement this
 func (p *AudioPlayer) UpdateVolumeIfNeeded() {
 	if ebiten.IsKeyPressed(ebiten.KeyMinus) {
 		p.volume128--
@@ -261,8 +261,8 @@ func (p *AudioPlayer) UpdateVolumeIfNeeded() {
 
 //JukeBox for playing songs
 
-//JukeBox is used to control BG Music at least.
-//Possible SE support
+// JukeBox is used to control BG Music at least.
+// Possible SE support
 type JukeBox struct {
 	AudioPlayer  *AudioPlayer
 	SongList     []string
@@ -275,7 +275,7 @@ type JukeBox struct {
 	currIndx     int
 }
 
-//CreateJukeBox from passed audioplayer, music and sound effect lists
+// CreateJukeBox from passed audioplayer, music and sound effect lists
 func CreateJukeBox(audioPlayer *AudioPlayer, musicList []string) *JukeBox {
 	j := &JukeBox{
 		AudioPlayer:  audioPlayer,
@@ -287,7 +287,7 @@ func CreateJukeBox(audioPlayer *AudioPlayer, musicList []string) *JukeBox {
 	return j
 }
 
-//ContinuousPlay of the song based on passed song name
+// ContinuousPlay of the song based on passed song name
 func (j *JukeBox) ContinuousPlay(songName string) {
 	/*for i, s := range j.SongList {
 		if s == songName {
@@ -302,14 +302,14 @@ func (j *JukeBox) ContinuousPlay(songName string) {
 	}
 }
 
-//PlaySong with the given name at the passed volume
+// PlaySong with the given name at the passed volume
 func (j *JukeBox) PlaySong(songName string, vol float64) {
 	j.AudioPlayer.ReturnSongPlayer(songName).Rewind()
 	j.AudioPlayer.ReturnSongPlayer(songName).Play()
 	j.AudioPlayer.ReturnSongPlayer(songName).SetVolume(vol)
 }
 
-//PlayBG plays background music in the given order
+// PlayBG plays background music in the given order
 func (j *JukeBox) PlayBG() {
 	if j.currIndx == -1 {
 		j.currIndx = 0
@@ -327,7 +327,7 @@ func (j *JukeBox) PlayBG() {
 	}
 }
 
-//CurrentSongName returns the name of the song that is currently being played
+// CurrentSongName returns the name of the song that is currently being played
 func (j *JukeBox) CurrentSongName() string {
 	if j.currIndx != -1 {
 		return j.SongList[j.currIndx]

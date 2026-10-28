@@ -27,7 +27,7 @@ func NewHUD(screenWidth, screenHeight float64) *HUD {
 	return hud
 }
 
-//Update updates the HUD....prevHealth
+//Update updates the HUD
 func (hud *HUD) Update() {
 	//hud.x = Components.Camera.GetX()
 	//hud.y = Components.Camera.GetY()
